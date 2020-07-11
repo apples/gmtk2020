@@ -6,6 +6,7 @@ function player.update(eid, delta)
     local body = entities:get_component(eid, component.body)
     local transform = entities:get_component(eid, component.transform)
     local player = entities:get_component(eid, component.player)
+    local currency = get_currency()
 
     if controller.left then
         body.vel.x = -15
@@ -23,9 +24,11 @@ function player.update(eid, delta)
         body.vel.y = 10
     end
 
-    if controller.sow_defensive then--and currency > 20 then
-        --set_currency(currency - 20)
-        body.vel.y = -10
+    if controller.sow_defensive and currency >= 20 and entities then
+        set_currency(currency - 20)
+        body.vel.y = -10--testing
+
+
     end
 end
 
