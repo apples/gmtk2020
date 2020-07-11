@@ -25,7 +25,8 @@ scene_gameplay::scene_gameplay(ember::engine& engine, ember::scene* prev)
       sprite_mesh{get_sprite_mesh()}, // Sprite and tilemap meshes is created statically
       tilemap_mesh{get_tilemap_mesh()},
       lives(3) {
-    camera.height = 32; // Height of the camera viewport in world units, in this case 32 tiles
+    camera.aspect_ratio = 16/9.f;
+    camera.height = 22.5; // Height of the camera viewport in world units, in this case 32 tiles
     camera.near = -1; // Near plane of an orthographic view is away from camera, so this is actually +1 view range on Z
 }
 
@@ -36,13 +37,6 @@ scene_gameplay::scene_gameplay(ember::engine& engine, ember::scene* prev)
 void scene_gameplay::init() {
     // We want scripts to have access to the entities as a global variable, so it is set here.
     engine->lua["entities"] = std::ref(entities);
-    engine->lua["lose_life"] = [this]{
-        if (lives == 0) {
-            engine->queue_transition<scene_mainmenu>();
-        } else {
-            lives -= 1;
-        }
-    };
     // Call the "init" function in the "data/scripts/scenes/gameplay.lua" script, with no params.
     engine->call_script("scenes.gameplay", "init");
 }
@@ -52,10 +46,6 @@ void scene_gameplay::init() {
 // Updates gui_state as necessary.
 // Basically does everything except rendering.
 void scene_gameplay::tick(float delta) {
-    gui_state["health"] = lives;
-    gui_state["max_health"] = 3;
-    gui_state["score"] = 0;
-
     // Scripting system
     engine->call_script("systems.scripting", "visit", delta);
 
@@ -66,6 +56,15 @@ void scene_gameplay::tick(float delta) {
 
     // Physics system
     physics.step(*engine, entities, delta);
+
+    // Camera system
+    entities.visit([&](const component::player& player, const component::transform& transform) {
+        camera.pos = glm::vec3{
+            glm::clamp(glm::vec2{transform.pos} + player.focus, glm::vec2{-20.f, 11.25f}, glm::vec2{20.f, 999.f}), 0.f};
+    });
+
+    // Reset controllers
+    entities.visit([&](component::controller& con) { con.action_pressed = false; });
 }
 
 // Render function

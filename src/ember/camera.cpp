@@ -41,7 +41,7 @@ auto get_proj(const orthographic& cam) -> glm::mat4 {
 
 auto get_view(const orthographic& cam) -> glm::mat4 {
     auto mat = glm::mat4(1.f);
-    mat = glm::translate(mat, cam.pos);
+    mat = glm::translate(mat, -cam.pos);
     mat = glm::mat4_cast(cam.rot) * mat;
     return mat;
 }

@@ -18,9 +18,6 @@
 
 namespace component {
 
-using tag_brick_breaker = ginseng::tag<struct tag_brick_breaker_t>;
-REFLECT(tag_brick_breaker)
-
 /** Actor script used for various events */
 struct script {
     std::string name; /** Script name within the 'actors.' namespace */
@@ -58,8 +55,9 @@ struct body {
     std::array<bool, N_TYPES> collides_with = {};
     glm::vec2 size = {0, 0};
     glm::vec2 vel = {0, 0};
+    glm::vec2 accel = {0, 0};
 };
-REFLECT(body, (size)(vel)(type)(layer)(collides_with))
+REFLECT(body, (type)(layer)(collides_with)(size)(vel)(accel))
 
 struct controller {
     bool left = false;
@@ -67,6 +65,11 @@ struct controller {
     bool action_pressed = false;
 };
 REFLECT(controller, (left)(right)(action_pressed))
+
+struct player {
+    glm::vec2 focus = {0, 0};
+};
+REFLECT(player, (focus))
 
 } // namespace component
 

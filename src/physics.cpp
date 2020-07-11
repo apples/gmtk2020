@@ -5,7 +5,7 @@
 void physics_system::step(ember::engine& engine, ember::database& entities, float delta) {
     time += delta;
 
-    delta = 1.f/240.f;
+    delta = 1.f/120.f;
 
     auto n_steps = int(time / delta);
 
@@ -26,6 +26,7 @@ void physics_system::step(ember::engine& engine, ember::database& entities, floa
         objects.reserve(entities.count_components<component::body>());
 
         entities.visit([&](ember::database::ent_id eid, component::body& body, component::transform& transform){
+            body.vel += body.accel * delta;
             transform.pos += glm::vec3{body.vel * delta, 0};
             objects.push_back({
                 {
@@ -112,10 +113,10 @@ void physics_system::step(ember::engine& engine, ember::database& entities, floa
                             a.transform->pos.y += resolve_y;
                             b.transform->pos.y -= resolve_y;
                             std::swap(a.body->vel.y, b.body->vel.y);
-                            a.left += resolve_y;
-                            a.right += resolve_y;
-                            b.left -= resolve_y;
-                            b.right -= resolve_y;
+                            a.bottom += resolve_y;
+                            a.top += resolve_y;
+                            b.bottom -= resolve_y;
+                            b.top -= resolve_y;
                         }
                     } else if (b.body->type == type_t::DYNAMIC) {
                         if (w < h) {
@@ -124,8 +125,7 @@ void physics_system::step(ember::engine& engine, ember::database& entities, floa
                                 resolve_x = -resolve_x;
                             }
                             b.transform->pos.x -= resolve_x;
-                            b.body->vel.x *= -1;
-                            b.body->vel.y += a.body->vel.y / 2;
+                            b.body->vel.x = 0;
                             b.left -= resolve_x;
                             b.right -= resolve_x;
                         } else {
@@ -134,10 +134,9 @@ void physics_system::step(ember::engine& engine, ember::database& entities, floa
                                 resolve_y = -resolve_y;
                             }
                             b.transform->pos.y -= resolve_y;
-                            b.body->vel.x += a.body->vel.x / 2;
-                            b.body->vel.y *= -1;
-                            b.left -= resolve_y;
-                            b.right -= resolve_y;
+                            b.body->vel.y = 0;
+                            b.bottom -= resolve_y;
+                            b.top -= resolve_y;
                         }
                     } else if (a.body->type == type_t::KINEMATIC && b.body->type == type_t::KINEMATIC) {
                         throw std::runtime_error("Not implemented!");
