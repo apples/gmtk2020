@@ -1,4 +1,5 @@
 local new_player = require('archetypes.player')
+local new_plant = require('archetypes.defensivePlant')
 
 local scene = {}
 
@@ -39,6 +40,16 @@ function scene.init()
 
     new_player()
     make_ground()
+
+    local sprite2 = component.sprite.new()
+    sprite2.texture = 'DefensePlant1';
+    sprite2.frames:add(0)
+
+    local transform2 = component.transform.new()
+
+    local eid2 = entities:create_entity()
+    entities:add_component(eid2, sprite2)
+    entities:add_component(eid2, transform2)
 
     print('Initialized gameplay.')
 end
