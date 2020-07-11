@@ -29,14 +29,12 @@ struct transform : sushi::transform {};
 REFLECT(transform, (pos)(rot)(scl))
 
 struct sprite {
-    std::string texture;
-    glm::vec2 uv_size = {1, 1};
-    glm::vec2 origin = {0, 0};
-    glm::vec2 scale = {1, 1};
-    std::vector<int> frames;
+    std::string name;
+    int state = 0;
+    bool flip = false;
     float time = 0;
 };
-REFLECT(sprite, (texture)(uv_size)(origin)(scale)(frames)(time))
+REFLECT(sprite, (name)(state)(flip)(time))
 
 struct body {
     enum type_t {

@@ -1,10 +1,6 @@
 return function(x, y)
     local sprite = component.sprite.new()
-    sprite.texture = 'DefensePlant1'
-    sprite.origin.y = -0.5
-    sprite.scale.x = 0.5
-    sprite.scale.y = 0.25
-    sprite.frames:add(0)
+    sprite.name = 'defensivePlant'
 
     local transform = component.transform.new()
     transform.pos.x = x

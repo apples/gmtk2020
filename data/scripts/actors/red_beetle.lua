@@ -2,19 +2,12 @@ local red_beetle = {}
 
 function red_beetle.update(eid, delta)
     local body = entities:get_component(eid, component.body)
-    local sprite = entities:get_component(eid, component.sprite)
     local transform = entities:get_component(eid, component.transform)
     local targeting = entities:get_component(eid, component.targeting)
 
     local max_speed = 5
     local acceleration = 3
     local acceleration_brakes = 3
-
-    if body.vel.x < 0 then
-        sprite.scale.x = math.abs(sprite.scale.x) * -1
-    elseif body.vel.x > 0 then
-        sprite.scale.x = math.abs(sprite.scale.x)
-    end
 
     if targeting.target and entities:exists(targeting.target) then
         local target_transform = entities:get_component(targeting.target, component.transform)

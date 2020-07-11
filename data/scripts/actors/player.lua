@@ -2,31 +2,6 @@ local new_plant = require('archetypes.defensivePlant')
 
 local player = {}
 
-local function set_idle(eid)
-    local sprite = entities:get_component(eid, component.sprite)
-    if sprite.texture ~= 'player' then
-        sprite.texture = 'player'
-        sprite.uv_size = vec2.new(1, 1)
-        sprite.frames:clear()
-        sprite.frames:add(0)
-        sprite.time = 0
-    end
-end
-
-local function set_walk(eid)
-    local sprite = entities:get_component(eid, component.sprite)
-    if sprite.texture ~= 'player_walk' then
-        sprite.texture = 'player_walk'
-        sprite.uv_size = vec2.new(0.5, 0.5)
-        sprite.frames:clear()
-        sprite.frames:add(0)
-        sprite.frames:add(1)
-        sprite.frames:add(2)
-        sprite.frames:add(3)
-        sprite.time = 0
-    end
-end
-
 function player.update(eid, delta)
     local controller = entities:get_component(eid, component.controller)
     local body = entities:get_component(eid, component.body)
@@ -37,17 +12,12 @@ function player.update(eid, delta)
     local focus_speed = 15
 
     if controller.left then
-        set_walk(eid)
         body.vel.x = -15
-        transform.scl.x = 1
         player.focus.x = math.max(player.focus.x - delta * focus_speed, -3)
     elseif controller.right then
-        set_walk(eid)
         body.vel.x = 15
-        transform.scl.x = -1
         player.focus.x = math.min(player.focus.x + delta * focus_speed, 3)
     else
-        set_idle(eid)
         body.vel.x = 0
     end
 

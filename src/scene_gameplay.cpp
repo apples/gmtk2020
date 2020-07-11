@@ -4,6 +4,11 @@
 #include "components.hpp"
 #include "meshes.hpp"
 
+#include "animations/default.hpp"
+#include "animations/player.hpp"
+#include "animations/red_beetle.hpp"
+#include "animations/defensivePlant.hpp"
+
 #include "ember/camera.hpp"
 #include "ember/engine.hpp"
 #include "ember/vdom.hpp"
@@ -27,12 +32,19 @@ scene_gameplay::scene_gameplay(ember::engine& engine, ember::scene* prev)
       tilemap_mesh{},
       screen_mesh{},
       world_width(80),
-      rng(std::random_device{}()) {
+      rng(std::random_device{}()),
+      animations{} {
     tilemap_mesh = get_tilemap_mesh(world_width);
     screen_mesh = get_screen_mesh(11.25 * 16 / 9.f, 11.25);
     camera.aspect_ratio = 16/9.f;
     camera.height = 11.25; // Height of the camera viewport in world units, in this case 32 tiles
     camera.near = -1; // Near plane of an orthographic view is away from camera, so this is actually +1 view range on Z
+
+    // Prepare animations
+    animations["default"] = std::make_shared<default_animation>();
+    animations["player"] = std::make_shared<player_animation>();
+    animations["red_beetle"] = std::make_shared<red_beetle_animation>();
+    animations["defensivePlant"] = std::make_shared<defensivePlant_animation>();
 }
 
 // Scene initialization
@@ -89,11 +101,6 @@ void scene_gameplay::tick(float delta) {
     // Scripting system
     engine->call_script("systems.scripting", "visit", delta);
 
-    // Sprite system
-    entities.visit([&](component::sprite& sprite) {
-        sprite.time += delta;
-    });
-
     // Physics system
     physics.step(*engine, entities, delta);
 
@@ -108,6 +115,15 @@ void scene_gameplay::tick(float delta) {
                                    0.f} *
                          32.f) /
                      32.f;
+    });
+
+    // Sprite system
+    entities.visit([&](ember::database::ent_id eid, component::sprite& sprite) {
+        sprite.time += delta;
+        auto iter = animations.find(sprite.name);
+        if (iter != end(animations)) {
+            iter->second->update(entities, eid);
+        }
     });
 
     // Reset controllers
@@ -188,34 +204,45 @@ void scene_gameplay::render() {
     }
 
     // Render entities
-    entities.visit([&](const component::sprite& sprite, const component::transform& transform) {
-        auto spritemat = glm::scale(glm::mat4{1}, glm::vec3{sprite.scale, 1});
-        spritemat = glm::translate(spritemat, glm::vec3{-sprite.origin, 0});
-        auto modelmat = to_mat4(transform) * spritemat;
+    entities.visit(
+        [&](ember::database::ent_id eid, const component::sprite& sprite, const component::transform& transform) {
+            auto iter = animations.find(sprite.name);
+            if (iter == end(animations)) {
+                iter = animations.find("default");
+            }
+            
+            auto info = iter->second->get_frame(entities, eid);
 
-        auto tex = engine->texture_cache.get(sprite.texture);
+            if (sprite.flip) {
+                info.scale.x *= -1;
+            }
 
-        // Calculate UV matrix for rendering the correct sprite.
-        auto cols = int(1 / sprite.uv_size.x);
-        auto frame = sprite.frames[int(sprite.time * 12) % sprite.frames.size()];
-        auto uvoffset = glm::vec2{frame % cols, frame / cols} * sprite.uv_size;
-        auto uvmat = glm::mat3{1.f};
-        uvmat = glm::translate(uvmat, uvoffset);
-        uvmat = glm::scale(uvmat, sprite.uv_size);
+            auto spritemat = glm::scale(glm::mat4{1}, glm::vec3{info.scale, 1});
+            spritemat = glm::translate(spritemat, glm::vec3{-info.origin, 0});
+            auto modelmat = to_mat4(transform) * spritemat;
 
-        // Set matrix uniforms.
-        engine->basic_shader.set_uvmat(uvmat);
-        engine->basic_shader.set_normal_mat(glm::inverseTranspose(view * modelmat));
-        engine->basic_shader.set_MVP(proj * view * modelmat);
+            auto tex = engine->texture_cache.get(info.texture);
 
-        if (tex) {
-            sushi::set_texture(0, *tex);
-        } else {
-            std::cout << "Warning: Texture not found: " << sprite.texture << std::endl;
-        }
-        
-        sushi::draw_mesh(sprite_mesh);
-    });
+            // Calculate UV matrix for rendering the correct sprite.
+            auto cols = int(1 / info.uv_size.x);
+            auto uvoffset = glm::vec2{info.frame % cols, info.frame / cols} * info.uv_size;
+            auto uvmat = glm::mat3{1.f};
+            uvmat = glm::translate(uvmat, uvoffset);
+            uvmat = glm::scale(uvmat, info.uv_size);
+
+            // Set matrix uniforms.
+            engine->basic_shader.set_uvmat(uvmat);
+            engine->basic_shader.set_normal_mat(glm::inverseTranspose(view * modelmat));
+            engine->basic_shader.set_MVP(proj * view * modelmat);
+
+            if (tex) {
+                sushi::set_texture(0, *tex);
+            } else {
+                std::cout << "Warning: Texture not found: " << info.texture << std::endl;
+            }
+
+            sushi::draw_mesh(sprite_mesh);
+        });
 }
 
 // Handle input events, called asynchronously

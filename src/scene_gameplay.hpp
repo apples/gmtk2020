@@ -1,6 +1,7 @@
 #pragma once
 
 #include "physics.hpp"
+#include "animation_state_machine.hpp"
 
 #include "ember/camera.hpp"
 #include "ember/entities.hpp"
@@ -36,4 +37,5 @@ private:
     sushi::mesh_group screen_mesh;
     int world_width;
     std::mt19937 rng;
+    std::unordered_map<std::string, std::shared_ptr<animation_state_machine>> animations;
 };

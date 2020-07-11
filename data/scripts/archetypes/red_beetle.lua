@@ -1,14 +1,6 @@
 return function(x, y)
     local sprite = component.sprite.new()
-    sprite.texture = 'red_beetle'
-    sprite.uv_size.x = 0.5
-    sprite.uv_size.y = 0.5
-    sprite.scale.x = 0.5
-    sprite.scale.y = 0.5
-    sprite.frames:add(0)
-    sprite.frames:add(1)
-    sprite.frames:add(2)
-    sprite.frames:add(3)
+    sprite.name = 'red_beetle'
 
     local transform = component.transform.new()
     transform.pos.x = x
