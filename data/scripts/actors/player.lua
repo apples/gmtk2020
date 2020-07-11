@@ -12,11 +12,11 @@ function player.update(eid, delta)
     if controller.left then
         body.vel.x = -15
         transform.scl.x = 1
-        player.focus.x = math.max(player.focus.x - delta * 40, -3)
+        player.focus.x = math.max(player.focus.x - delta * 30, -3)
     elseif controller.right then
         body.vel.x = 15
         transform.scl.x = -1
-        player.focus.x = math.min(player.focus.x + delta * 40, 3)
+        player.focus.x = math.min(player.focus.x + delta * 30, 3)
     else
         body.vel.x = 0
     end

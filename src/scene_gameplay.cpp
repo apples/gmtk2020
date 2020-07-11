@@ -80,7 +80,7 @@ void scene_gameplay::tick(float delta) {
 
     // Camera system
     entities.visit([&](const component::player& player, const component::transform& transform) {
-        auto range = world_width/2 - 20.f;
+        auto range = world_width/2 - camera.height * camera.aspect_ratio / 2.f;
         camera.pos = glm::floor(
                          glm::vec3{glm::clamp(
                                        glm::vec2{transform.pos} + player.focus,
