@@ -117,6 +117,17 @@ void scene_gameplay::tick(float delta) {
     // Physics system
     physics.step(*engine, entities, delta);
 
+
+    // Health system
+    entities.visit([&](ember::database::ent_id eid, component::health& health) {
+        if (health.current > health.max) {
+            health.current = health.max;
+        }
+        if (health.current == 0) {
+            entities.destroy_entity(eid);
+        }
+    });
+
     // Camera system
     entities.visit([&](const component::player& player, const component::transform& transform) {
         auto range = world_width / 2.f - camera.height * camera.aspect_ratio / 2.f;

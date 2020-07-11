@@ -91,6 +91,12 @@ struct shooter {
 };
 REFLECT(shooter, (cooldown)(cooldown_timer))
 
+struct health {
+    int current = 1;
+    int max = 1;
+};
+REFLECT(health, (current)(max))
+
 } // namespace component
 
 #include "ember/reflection_end.hpp"
