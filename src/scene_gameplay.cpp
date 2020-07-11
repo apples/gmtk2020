@@ -43,6 +43,8 @@ void scene_gameplay::init() {
     engine->lua["set_currency"] = [this](int c) { currency = c; };
     // Call the "init" function in the "data/scripts/scenes/gameplay.lua" script, with no params.
     engine->call_script("scenes.gameplay", "init");
+
+    currency = 200;
 }
 
 // Tick/update function
@@ -75,6 +77,8 @@ void scene_gameplay::tick(float delta) {
         con.sow_defensive = false;
         con.sow_valuable = false;
     });
+
+    gui_state["currency"] = currency;
 }
 
 // Render function
