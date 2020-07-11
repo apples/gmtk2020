@@ -43,4 +43,6 @@ auto red_beetle_animation::get_frame(ember::database& entities, const ember::dat
             };
         }
     }
+
+    return {"red_beetle"};
 }

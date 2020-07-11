@@ -59,8 +59,9 @@ struct body {
     float top = 0;
     glm::vec2 vel = {0, 0};
     glm::vec2 accel = {0, 0};
+    glm::vec2 vel_damp = {0, 0};
 };
-REFLECT(body, (type)(layer)(collides_with)(left)(right)(bottom)(top)(vel)(accel))
+REFLECT(body, (type)(layer)(collides_with)(left)(right)(bottom)(top)(vel)(accel)(vel_damp))
 
 struct controller {
     bool left = false;
@@ -84,7 +85,18 @@ REFLECT(targeting, (target))
 using plant_tag = ginseng::tag<struct plant_tag_T>;
 REFLECT(plant_tag)
 
-} // namespace component
+struct shooter {
+    float cooldown = 1;
+    float cooldown_timer = 1;
+};
+REFLECT(shooter, (cooldown)(cooldown_timer))
 
+struct health {
+    int current = 1;
+    int max = 1;
+};
+REFLECT(health, (current)(max))
+
+} // namespace component
 
 #include "ember/reflection_end.hpp"

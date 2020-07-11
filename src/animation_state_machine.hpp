@@ -14,6 +14,7 @@ public:
         glm::vec2 origin = {0, 0};
         glm::vec2 scale = {1, 1};
         int frame = 0;
+        glm::vec2 heading = {1, 0};
     };
 
     virtual ~animation_state_machine() = 0;

@@ -26,6 +26,7 @@ void physics_system::step(ember::engine& engine, ember::database& entities, floa
         objects.reserve(entities.count_components<component::body>());
 
         entities.visit([&](ember::database::ent_id eid, component::body& body, component::transform& transform){
+            body.vel *= glm::pow(glm::vec2{1, 1} - body.vel_damp, glm::vec2{delta, delta});
             body.vel += body.accel * delta;
             transform.pos += glm::vec3{body.vel * delta, 0};
             objects.push_back({
