@@ -78,6 +78,10 @@ struct player {
 };
 REFLECT(player, (focus))
 
+using plant_tag = ginseng::tag<struct plant_tag_T>;
+REFLECT(plant_tag)
+
 } // namespace component
+
 
 #include "ember/reflection_end.hpp"

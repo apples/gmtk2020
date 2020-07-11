@@ -43,6 +43,17 @@ void scene_gameplay::init() {
     //engine->lua["currency"] = std::ref(currency);
     engine->lua["set_currency"] = [this](int c) { currency = c; };
     engine->lua["get_currency"] = [this]() { return currency; };
+
+    engine->lua["plant_at_position"] = [this](int x, int y) {
+        glm::vec2 snappedPos = glm::vec2(floor(x * 2) / 2, floor(y * 2) / 2);
+
+        entities.visit([&](component::plant_tag, component::transform& trans){
+            if(trans.pos.x == snappedPos.x && trans.pos.y == snappedPos.y) {
+                return true;
+            }
+        });
+        return false;
+    };
     // Call the "init" function in the "data/scripts/scenes/gameplay.lua" script, with no params.
     engine->call_script("scenes.gameplay", "init");
 

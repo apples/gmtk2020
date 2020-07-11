@@ -11,7 +11,7 @@ return function(x, y)
     transform.pos.y = y
 
     local body = component.body.new()
-    body.type = 1
+    body.type = 0
     body.layer = 1
     body.left = -0.25
     body.right  = 0.25

@@ -1,3 +1,4 @@
+local new_plant = require('archetypes.defensivePlant')
 
 local player = {}
 
@@ -24,11 +25,19 @@ function player.update(eid, delta)
         body.vel.y = 10
     end
 
-    if controller.sow_defensive and currency >= 20 and entities then
-        set_currency(currency - 20)
-        body.vel.y = -10--testing
+    if controller.sow_defensive and currency >= 20 then
+        local hasPlantAtLocation = false
 
+        if not plant_at_position(transform.pos.x, transform.pos.y) then
+            set_currency(currency - 20)
+            body.vel.y = -10--testing
 
+            new_plant(math.floor(transform.pos.x * 2) / 2, math.floor((transform.pos.y - .5) * 2) / 2)
+            --local eid = entities.create_entity()
+            --entities.add_component(eid, component.plant_tag)
+            --entities.add_component(eid, component.defensivePlant)
+        end
+        
     end
 end
 
