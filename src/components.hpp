@@ -63,8 +63,10 @@ struct controller {
     bool left = false;
     bool right = false;
     bool action_pressed = false;
+    bool sow_defensive = false;
+    bool sow_valuable = false;
 };
-REFLECT(controller, (left)(right)(action_pressed))
+REFLECT(controller, (left)(right)(action_pressed)(sow_defensive)(sow_valuable))
 
 struct player {
     glm::vec2 focus = {0, 0};

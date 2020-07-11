@@ -20,6 +20,7 @@ scene_gameplay::scene_gameplay(ember::engine& engine, ember::scene* prev)
     : scene(engine),
       camera(), // Camera has a sane default constructor, it is tweaked below
       entities(), // Entity database has no constructor parameters
+      currency(),
       physics(), // Physics system
       gui_state{engine.lua.create_table()}, // Gui state is initialized to an empty Lua table
       sprite_mesh{get_sprite_mesh()}, // Sprite and tilemap meshes is created statically
@@ -38,6 +39,8 @@ scene_gameplay::scene_gameplay(ember::engine& engine, ember::scene* prev)
 void scene_gameplay::init() {
     // We want scripts to have access to the entities as a global variable, so it is set here.
     engine->lua["entities"] = std::ref(entities);
+    engine->lua["currency"] = std::ref(currency);
+    engine->lua["set_currency"] = [this](int c) { currency = c; };
     // Call the "init" function in the "data/scripts/scenes/gameplay.lua" script, with no params.
     engine->call_script("scenes.gameplay", "init");
 }
@@ -67,7 +70,7 @@ void scene_gameplay::tick(float delta) {
     });
 
     // Reset controllers
-    entities.visit([&](component::controller& con) { con.action_pressed = false; });
+    entities.visit([&](component::controller& con) { con.action_pressed = false; con.sow_defensive = false; con.sow_valuable = false;});
 }
 
 // Render function
@@ -164,6 +167,12 @@ auto scene_gameplay::handle_game_input(const SDL_Event& event) -> bool {
             case SDLK_UP:
             case SDLK_w:
                 update(pressed, nullptr, &controller::action_pressed);
+                return true;
+            case SDLK_q:
+                update(pressed, nullptr, &controller::sow_defensive);
+                return true;
+            case SDLK_e:
+                update(pressed, nullptr, &controller::sow_valuable);
                 return true;
             default:
                 return false;
