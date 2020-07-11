@@ -53,18 +53,21 @@ struct body {
     type_t type;
     layer_t layer;
     std::array<bool, N_TYPES> collides_with = {};
-    glm::vec2 size = {0, 0};
+    float left = 0;
+    float right = 0;
+    float bottom = 0;
+    float top = 0;
     glm::vec2 vel = {0, 0};
     glm::vec2 accel = {0, 0};
 };
-REFLECT(body, (type)(layer)(collides_with)(size)(vel)(accel))
+REFLECT(body, (type)(layer)(collides_with)(left)(right)(bottom)(top)(vel)(accel))
 
 struct controller {
     bool left = false;
     bool right = false;
-    bool action_pressed = false;
+    bool jump_pressed = false;
 };
-REFLECT(controller, (left)(right)(action_pressed))
+REFLECT(controller, (left)(right)(jump_pressed))
 
 struct player {
     glm::vec2 focus = {0, 0};

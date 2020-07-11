@@ -30,10 +30,10 @@ void physics_system::step(ember::engine& engine, ember::database& entities, floa
             transform.pos += glm::vec3{body.vel * delta, 0};
             objects.push_back({
                 {
-                    transform.pos.x - body.size.x/2,
-                    transform.pos.x + body.size.x/2,
-                    transform.pos.y - body.size.y/2,
-                    transform.pos.y + body.size.y/2,
+                    transform.pos.x + body.left,
+                    transform.pos.x + body.right,
+                    transform.pos.y + body.bottom,
+                    transform.pos.y + body.top,
                 },
                 eid,
                 &body,

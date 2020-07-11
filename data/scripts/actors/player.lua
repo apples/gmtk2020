@@ -19,7 +19,7 @@ function player.update(eid, delta)
         body.vel.x = 0
     end
 
-    if controller.action_pressed then
+    if controller.jump_pressed then
         body.vel.y = 10
     end
 end

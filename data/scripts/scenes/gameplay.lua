@@ -8,8 +8,10 @@ local function make_ground()
     local body = component.body.new()
     body.type = 0
     body.layer = 2
-    body.size.x = 999
-    body.size.y = 2
+    body.left = -999
+    body.right = 999
+    body.bottom = -999
+    body.top = 1
 
     local eid = entities:create_entity()
     entities:add_component(eid, transform)
@@ -22,8 +24,10 @@ local function make_ground()
         local body = component.body.new()
         body.type = 0
         body.layer = 2
-        body.size.x = 2
-        body.size.y = 999
+        body.left = -1
+        body.right = 1
+        body.bottom = -999
+        body.top = 999
 
         local eid = entities:create_entity()
         entities:add_component(eid, transform)

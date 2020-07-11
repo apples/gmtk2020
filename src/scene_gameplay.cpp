@@ -67,7 +67,7 @@ void scene_gameplay::tick(float delta) {
     });
 
     // Reset controllers
-    entities.visit([&](component::controller& con) { con.action_pressed = false; });
+    entities.visit([&](component::controller& con) { con.jump_pressed = false; });
 }
 
 // Render function
@@ -159,7 +159,7 @@ auto scene_gameplay::handle_game_input(const SDL_Event& event) -> bool {
                 update(pressed, &controller::right, nullptr);
                 return true;
             case SDLK_SPACE:
-                update(pressed, nullptr, &controller::action_pressed);
+                update(pressed, nullptr, &controller::jump_pressed);
                 return true;
             default:
                 return false;
