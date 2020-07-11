@@ -26,7 +26,7 @@ function player.update(eid, delta)
     end
 
     if controller.sow_defensive and currency >= 20 then
-        local hasPlantAtLocation = false
+        --local hasPlantAtLocation = false
 
         if not plant_at_position(transform.pos.x, transform.pos.y) then
             set_currency(currency - 20)

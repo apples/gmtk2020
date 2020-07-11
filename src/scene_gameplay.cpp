@@ -46,15 +46,17 @@ void scene_gameplay::init() {
     engine->lua["set_currency"] = [this](int c) { currency = c; };
     engine->lua["get_currency"] = [this]() { return currency; };
 
-    engine->lua["plant_at_position"] = [this](int x, int y) {
-        glm::vec2 snappedPos = glm::vec2(floor(x * 2) / 2, floor(y * 2) / 2);
-
+    engine->lua["plant_at_position"] = [this](float x, float y) {
+        glm::vec2 snappedPos = glm::vec2(floor(x * 2) / 2, floor((y - .5) * 2) / 2);
+        bool result = false;
+        std::cout << "HEY " << std::endl;
         entities.visit([&](component::plant_tag, component::transform& trans){
+            std::cout << std::to_string(trans.pos.x) + ' ' + std::to_string(snappedPos.x) + ": " + std::to_string(trans.pos.y) + ' ' + std::to_string(snappedPos.y)  << std::endl;
             if(trans.pos.x == snappedPos.x && trans.pos.y == snappedPos.y) {
-                return true;
+                result = true;
             }
         });
-        return false;
+        return result;
     };
     // Call the "init" function in the "data/scripts/scenes/gameplay.lua" script, with no params.
     engine->call_script("scenes.gameplay", "init");
