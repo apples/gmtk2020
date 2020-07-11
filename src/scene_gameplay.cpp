@@ -25,8 +25,10 @@ scene_gameplay::scene_gameplay(ember::engine& engine, ember::scene* prev)
       gui_state{engine.lua.create_table()}, // Gui state is initialized to an empty Lua table
       sprite_mesh{get_sprite_mesh()}, // Sprite and tilemap meshes is created statically
       tilemap_mesh{},
+      screen_mesh{},
       world_width(80) {
     tilemap_mesh = get_tilemap_mesh(world_width);
+    screen_mesh = get_screen_mesh(11.25 * 16 / 9.f, 11.25);
     camera.aspect_ratio = 16/9.f;
     camera.height = 11.25; // Height of the camera viewport in world units, in this case 32 tiles
     camera.near = -1; // Near plane of an orthographic view is away from camera, so this is actually +1 view range on Z
@@ -113,6 +115,35 @@ void scene_gameplay::render() {
     // Get projection and view matrices from camera.
     auto proj = get_proj(camera);
     auto view = get_view(camera);
+
+    // Render background
+    {
+        auto modelmat = glm::mat4{1.f};
+
+        for (int i = 0; i < 3; ++i) {
+            auto w = camera.height * camera.aspect_ratio;
+            auto h = camera.height;
+            auto pan_strength = i * 0.25f;
+            auto pan_pos = -glm::mod(
+                glm::vec2{camera.pos} * pan_strength, glm::vec2{w, h});
+
+            for (const auto& offset : {
+                     glm::vec2{0, 0},
+                     glm::vec2{w, 0},
+                     glm::vec2{0, h},
+                     glm::vec2{w, h},
+                 }) {
+                auto bgview = glm::translate(glm::mat4{1.f}, glm::vec3{pan_pos + offset, 0});
+
+                engine->basic_shader.set_uvmat(glm::mat3{1.f});
+                engine->basic_shader.set_normal_mat(glm::inverseTranspose(bgview * modelmat));
+                engine->basic_shader.set_MVP(proj * bgview * modelmat);
+
+                sushi::set_texture(0, *engine->texture_cache.get("background/" + std::to_string(i)));
+                sushi::draw_mesh(screen_mesh);
+            }
+        }
+    }
 
     // Render tilemap
     {
