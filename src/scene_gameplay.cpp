@@ -110,16 +110,19 @@ void scene_gameplay::render() {
 
     // Render entities
     entities.visit([&](const component::sprite& sprite, const component::transform& transform) {
-        auto modelmat = to_mat4(transform);
+        auto spritemat = glm::scale(glm::mat4{1}, glm::vec3{sprite.scale, 1});
+        spritemat = glm::translate(spritemat, glm::vec3{-sprite.origin, 0});
+        auto modelmat = to_mat4(transform) * spritemat;
+
         auto tex = engine->texture_cache.get(sprite.texture);
 
         // Calculate UV matrix for rendering the correct sprite.
-        auto cols = int(1 / sprite.size.x);
+        auto cols = int(1 / sprite.uv_size.x);
         auto frame = sprite.frames[int(sprite.time * 12) % sprite.frames.size()];
-        auto uvoffset = glm::vec2{frame % cols, frame / cols} * sprite.size;
+        auto uvoffset = glm::vec2{frame % cols, frame / cols} * sprite.uv_size;
         auto uvmat = glm::mat3{1.f};
         uvmat = glm::translate(uvmat, uvoffset);
-        uvmat = glm::scale(uvmat, sprite.size);
+        uvmat = glm::scale(uvmat, sprite.uv_size);
 
         // Set matrix uniforms.
         engine->basic_shader.set_uvmat(uvmat);

@@ -1,7 +1,6 @@
 return function()
     local sprite = component.sprite.new()
     sprite.texture = 'player';
-    sprite.size.y = 1/1
     sprite.frames:add(0)
 
     local transform = component.transform.new()
