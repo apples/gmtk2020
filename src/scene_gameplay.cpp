@@ -153,12 +153,16 @@ auto scene_gameplay::handle_game_input(const SDL_Event& event) -> bool {
         auto pressed = key.state == SDL_PRESSED;
         switch (key.keysym.sym) {
             case SDLK_LEFT:
+            case SDLK_a:
                 update(pressed, &controller::left, nullptr);
                 return true;
             case SDLK_RIGHT:
+            case SDLK_d:
                 update(pressed, &controller::right, nullptr);
                 return true;
             case SDLK_SPACE:
+            case SDLK_UP:
+            case SDLK_w:
                 update(pressed, nullptr, &controller::action_pressed);
                 return true;
             default:
