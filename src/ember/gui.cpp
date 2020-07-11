@@ -358,7 +358,7 @@ void label::calculate_layout() {
 
     font = attr_font.value_or("LiberationSans-Regular");
 
-    auto attr_color = get_attribute("color").value_or("#000");
+    auto attr_color = get_attribute("color").value_or("#f0f");
 
     color = {0, 0, 0, 1};
 
