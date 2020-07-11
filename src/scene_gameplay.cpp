@@ -48,11 +48,9 @@ void scene_gameplay::init() {
     engine->lua["get_currency"] = [this]() { return currency; };
 
     engine->lua["plant_at_position"] = [this](float x, float y) {
-        glm::vec2 snappedPos = glm::vec2(floor(x * 2) / 2, floor((y - .5) * 2) / 2);
+        auto snappedPos = glm::vec2(std::floor(x * 2) / 2, std::floor((y - .5) * 2) / 2);
         bool result = false;
-        std::cout << "HEY " << std::endl;
-        entities.visit([&](component::plant_tag, component::transform& trans){
-            std::cout << std::to_string(trans.pos.x) + ' ' + std::to_string(snappedPos.x) + ": " + std::to_string(trans.pos.y) + ' ' + std::to_string(snappedPos.y)  << std::endl;
+        entities.visit([&](component::plant_tag, component::transform& trans) {
             if(trans.pos.x == snappedPos.x && trans.pos.y == snappedPos.y) {
                 result = true;
             }
@@ -79,7 +77,6 @@ void scene_gameplay::tick(float delta) {
                 auto result = roll(rng);
                 targeting.target = std::nullopt;
                 entities.visit([&](ember::database::ent_id eid, component::plant_tag) {
-                    std::cout << result << std::endl;
                     if (result == 0) {
                         targeting.target = eid;
                     }
