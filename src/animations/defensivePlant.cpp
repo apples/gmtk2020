@@ -3,7 +3,10 @@
 #include "../components.hpp"
 
 enum states {
-    IDLE,
+    GROWTH1,
+    GROWTH2,
+    GROWTH3,
+    GROWTH4,
 };
 
 void defensivePlant_animation::update(ember::database& entities, const ember::database::ent_id& eid) {
@@ -18,9 +21,9 @@ void defensivePlant_animation::update(ember::database& entities, const ember::da
 
     // Process state
     switch (sprite.state) {
-        case IDLE: {
+        //case GROWTH1: {
             break;
-        }
+        //}
     }
 }
 
@@ -29,12 +32,39 @@ auto defensivePlant_animation::get_frame(ember::database& entities, const ember:
 
     // Calculate frame
     switch (sprite.state) {
-        case IDLE: {
+        case GROWTH1: {
             return {
                 "DefensePlant1",
                 {1, 1},
                 {0, -0.5},
                 {0.5, 0.25},
+                0,
+            };
+        }
+        case GROWTH2: {
+            return {
+                "DefensePlant2",
+                {1, 1},
+                {0, -0.5},
+                {0.5, 1.0},
+                0,
+            };
+        }
+        case GROWTH3: {
+            return {
+                "DefensePlant3",
+                {1, 1},
+                {0, -0.5},
+                {0.5, 1.0},
+                0,
+            };
+        }
+        case GROWTH4: {
+            return {
+                "DefensePlant4",
+                {1, 1},
+                {0, -0.5},
+                {0.5, 2.0},
                 0,
             };
         }

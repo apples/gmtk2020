@@ -128,6 +128,18 @@ void scene_gameplay::tick(float delta) {
         }
     });
 
+    // Growth system
+    entities.visit([&](ember::database::ent_id eid, component::growth& growth) {
+        growth.growthTimer -= delta;
+        if (growth.growthTimer <= 0) {
+            growth.stage++;
+            if (auto script = entities.get_component<component::script*>(eid)) {
+                engine->call_script("actors." + script->name, "grow", eid, growth.stage);
+            }
+            growth.growthTimer = growth.growTime;
+        }
+    });
+
     // Camera system
     entities.visit([&](const component::player& player, const component::transform& transform) {
         auto range = world_width / 2.f - camera.height * camera.aspect_ratio / 2.f;

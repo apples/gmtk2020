@@ -97,6 +97,13 @@ struct health {
 };
 REFLECT(health, (current)(max))
 
+struct growth {
+    float growthTimer = 1;
+    float growTime = 1;//how long it should take to mature again
+    int stage = 0;
+};
+REFLECT(growth, (growthTimer)(growTime)(stage))
+
 } // namespace component
 
 #include "ember/reflection_end.hpp"

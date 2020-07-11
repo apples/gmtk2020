@@ -20,6 +20,8 @@ return function(x, y)
     script.name = 'defensivePlant'
 
     local shooter = component.shooter.new()
+    
+    local growth = component.growth.new()
 
     local eid = entities:create_entity()
     entities:add_component(eid, sprite)
@@ -27,5 +29,6 @@ return function(x, y)
     entities:add_component(eid, body)
     entities:add_component(eid, script)
     entities:add_component(eid, shooter)
+    entities:add_component(eid, growth)
     entities:add_component(eid, component.plant_tag.new())
 end
