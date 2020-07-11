@@ -28,7 +28,7 @@ scene_gameplay::scene_gameplay(ember::engine& engine, ember::scene* prev)
       world_width(80) {
     tilemap_mesh = get_tilemap_mesh(world_width);
     camera.aspect_ratio = 16/9.f;
-    camera.height = 22.5; // Height of the camera viewport in world units, in this case 32 tiles
+    camera.height = 11.25; // Height of the camera viewport in world units, in this case 32 tiles
     camera.near = -1; // Near plane of an orthographic view is away from camera, so this is actually +1 view range on Z
 }
 
@@ -66,9 +66,14 @@ void scene_gameplay::tick(float delta) {
     // Camera system
     entities.visit([&](const component::player& player, const component::transform& transform) {
         auto range = world_width/2 - 20.f;
-        camera.pos = glm::vec3{
-            glm::clamp(glm::vec2{transform.pos} + player.focus, glm::vec2{-range, 11.25f}, glm::vec2{range, 999.f}),
-            0.f};
+        camera.pos = glm::floor(
+                         glm::vec3{glm::clamp(
+                                       glm::vec2{transform.pos} + player.focus,
+                                       glm::vec2{-range, camera.height / 2},
+                                       glm::vec2{range, 999.f}),
+                                   0.f} *
+                         32.f) /
+                     32.f;
     });
 
     // Reset controllers
