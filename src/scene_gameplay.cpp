@@ -8,6 +8,7 @@
 #include "animations/player.hpp"
 #include "animations/red_beetle.hpp"
 #include "animations/defensivePlant.hpp"
+#include "animations/projectile.hpp"
 
 #include "ember/camera.hpp"
 #include "ember/engine.hpp"
@@ -45,6 +46,7 @@ scene_gameplay::scene_gameplay(ember::engine& engine, ember::scene* prev)
     animations["player"] = std::make_shared<player_animation>();
     animations["red_beetle"] = std::make_shared<red_beetle_animation>();
     animations["defensivePlant"] = std::make_shared<defensivePlant_animation>();
+    animations["projectile"] = std::make_shared<projectile_animation>();
 }
 
 // Scene initialization
@@ -95,6 +97,17 @@ void scene_gameplay::tick(float delta) {
                     --result;
                 });
             }
+        }
+    });
+
+    // Shooter system
+    entities.visit([&](ember::database::ent_id eid, component::shooter& shooter) {
+        shooter.cooldown_timer -= delta;
+        if (shooter.cooldown_timer <= 0) {
+            if (auto script = entities.get_component<component::script*>(eid)) {
+                engine->call_script("actors." + script->name, "shoot", eid);
+            }
+            shooter.cooldown_timer = shooter.cooldown;
         }
     });
 
@@ -219,6 +232,7 @@ void scene_gameplay::render() {
 
             auto spritemat = glm::scale(glm::mat4{1}, glm::vec3{info.scale, 1});
             spritemat = glm::translate(spritemat, glm::vec3{-info.origin, 0});
+            spritemat = glm::rotate(spritemat, glm::atan(info.heading.y, info.heading.x), glm::vec3{0, 0, 1});
             auto modelmat = to_mat4(transform) * spritemat;
 
             auto tex = engine->texture_cache.get(info.texture);
