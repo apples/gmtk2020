@@ -22,6 +22,11 @@ function player.update(eid, delta)
     if controller.jump_pressed then
         body.vel.y = 10
     end
+
+    if controller.sow_defensive then--and currency > 20 then
+        --set_currency(currency - 20)
+        body.vel.y = -10
+    end
 end
 
 return player
