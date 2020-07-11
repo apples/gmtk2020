@@ -40,16 +40,6 @@ function scene.init()
     new_player()
     make_ground()
 
-    local sprite = component.sprite.new()
-    sprite.texture = 'player';
-    sprite.frames:add(0)
-
-    local transform = component.transform.new()
-
-    local eid = entities:create_entity()
-    entities:add_component(eid, sprite)
-    entities:add_component(eid, transform)
-
     print('Initialized gameplay.')
 end
 

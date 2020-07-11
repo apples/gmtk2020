@@ -23,8 +23,9 @@ scene_gameplay::scene_gameplay(ember::engine& engine, ember::scene* prev)
       physics(), // Physics system
       gui_state{engine.lua.create_table()}, // Gui state is initialized to an empty Lua table
       sprite_mesh{get_sprite_mesh()}, // Sprite and tilemap meshes is created statically
-      tilemap_mesh{get_tilemap_mesh()},
-      lives(3) {
+      tilemap_mesh{},
+      world_width(80) {
+    tilemap_mesh = get_tilemap_mesh(world_width);
     camera.aspect_ratio = 16/9.f;
     camera.height = 22.5; // Height of the camera viewport in world units, in this case 32 tiles
     camera.near = -1; // Near plane of an orthographic view is away from camera, so this is actually +1 view range on Z
@@ -59,8 +60,10 @@ void scene_gameplay::tick(float delta) {
 
     // Camera system
     entities.visit([&](const component::player& player, const component::transform& transform) {
+        auto range = world_width/2 - 20.f;
         camera.pos = glm::vec3{
-            glm::clamp(glm::vec2{transform.pos} + player.focus, glm::vec2{-20.f, 11.25f}, glm::vec2{20.f, 999.f}), 0.f};
+            glm::clamp(glm::vec2{transform.pos} + player.focus, glm::vec2{-range, 11.25f}, glm::vec2{range, 999.f}),
+            0.f};
     });
 
     // Reset controllers
@@ -101,7 +104,7 @@ void scene_gameplay::render() {
         engine->basic_shader.set_normal_mat(glm::inverseTranspose(view * modelmat));
         engine->basic_shader.set_MVP(proj * view * modelmat);
 
-        sushi::set_texture(0, *engine->texture_cache.get("sprites"));
+        sushi::set_texture(0, *engine->texture_cache.get("tiles"));
         sushi::draw_mesh(tilemap_mesh);
     }
 
@@ -166,7 +169,10 @@ auto scene_gameplay::handle_game_input(const SDL_Event& event) -> bool {
     switch (event.type) {
         case SDL_KEYDOWN:
         case SDL_KEYUP:
-            return process_key(event.key);
+            if (event.key.repeat == 0) {
+                return process_key(event.key);
+            }
+            break;
     }
     return false;
 }

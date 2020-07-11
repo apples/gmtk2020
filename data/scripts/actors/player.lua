@@ -11,7 +11,6 @@ function player.update(eid, delta)
         body.vel.x = -15
         transform.scl.x = 1
         player.focus.x = math.max(player.focus.x - delta * 40, -3)
-        print(transform.pos.x)
     elseif controller.right then
         body.vel.x = 15
         transform.scl.x = -1
