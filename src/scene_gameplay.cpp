@@ -26,7 +26,8 @@ scene_gameplay::scene_gameplay(ember::engine& engine, ember::scene* prev)
       sprite_mesh{get_sprite_mesh()}, // Sprite and tilemap meshes is created statically
       tilemap_mesh{},
       screen_mesh{},
-      world_width(80) {
+      world_width(80),
+      rng(std::random_device{}()) {
     tilemap_mesh = get_tilemap_mesh(world_width);
     screen_mesh = get_screen_mesh(11.25 * 16 / 9.f, 11.25);
     camera.aspect_ratio = 16/9.f;
@@ -67,6 +68,25 @@ void scene_gameplay::init() {
 // Updates gui_state as necessary.
 // Basically does everything except rendering.
 void scene_gameplay::tick(float delta) {
+    // Targeting system
+    entities.visit([&](component::targeting& targeting) {
+        if (!targeting.target || !entities.exists(*targeting.target)) {
+            auto num_plants = entities.count_components<component::plant_tag>();
+            if (num_plants > 0) {
+                auto roll = std::uniform_int_distribution{0, num_plants - 1};
+                auto result = roll(rng);
+                targeting.target = std::nullopt;
+                entities.visit([&](ember::database::ent_id eid, component::plant_tag) {
+                    std::cout << result << std::endl;
+                    if (result == 0) {
+                        targeting.target = eid;
+                    }
+                    --result;
+                });
+            }
+        }
+    });
+
     // Scripting system
     engine->call_script("systems.scripting", "visit", delta);
 
@@ -80,7 +100,7 @@ void scene_gameplay::tick(float delta) {
 
     // Camera system
     entities.visit([&](const component::player& player, const component::transform& transform) {
-        auto range = world_width/2 - camera.height * camera.aspect_ratio / 2.f;
+        auto range = world_width / 2.f - camera.height * camera.aspect_ratio / 2.f;
         camera.pos = glm::floor(
                          glm::vec3{glm::clamp(
                                        glm::vec2{transform.pos} + player.focus,

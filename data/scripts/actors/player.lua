@@ -9,14 +9,16 @@ function player.update(eid, delta)
     local player = entities:get_component(eid, component.player)
     local currency = get_currency()
 
+    local focus_speed = 15
+
     if controller.left then
         body.vel.x = -15
         transform.scl.x = 1
-        player.focus.x = math.max(player.focus.x - delta * 30, -3)
+        player.focus.x = math.max(player.focus.x - delta * focus_speed, -3)
     elseif controller.right then
         body.vel.x = 15
         transform.scl.x = -1
-        player.focus.x = math.min(player.focus.x + delta * 30, 3)
+        player.focus.x = math.min(player.focus.x + delta * focus_speed, 3)
     else
         body.vel.x = 0
     end

@@ -11,7 +11,7 @@ function scripting.visit(delta)
             if script_impl.update then
                 local success, ret = pcall(script_impl.update, eid, delta)
                 if not success then
-                    print('ERROR: systems.scripting: actors.'..script.name..': '..ret)
+                    print('ERROR: systems.scripting: actors.'..script.name..': '..tostring(ret))
                 end
             end
         end

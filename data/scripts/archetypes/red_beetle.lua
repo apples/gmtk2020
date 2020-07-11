@@ -27,9 +27,12 @@ return function(x, y)
     local script = component.script.new()
     script.name = 'red_beetle'
 
+    local targeting = component.targeting.new()
+
     local eid = entities:create_entity()
     entities:add_component(eid, sprite)
     entities:add_component(eid, transform)
     entities:add_component(eid, body)
-    --entities:add_component(eid, script)
+    entities:add_component(eid, script)
+    entities:add_component(eid, targeting)
 end

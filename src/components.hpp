@@ -78,6 +78,11 @@ struct player {
 };
 REFLECT(player, (focus))
 
+struct targeting {
+    std::optional<ember::database::ent_id> target;
+};
+REFLECT(targeting, (target))
+
 using plant_tag = ginseng::tag<struct plant_tag_T>;
 REFLECT(plant_tag)
 

@@ -13,6 +13,7 @@
 #include <memory>
 #include <tuple>
 #include <vector>
+#include <random>
 
 class scene_gameplay final : public ember::scene {
 public:
@@ -34,4 +35,5 @@ private:
     sushi::mesh_group tilemap_mesh;
     sushi::mesh_group screen_mesh;
     int world_width;
+    std::mt19937 rng;
 };

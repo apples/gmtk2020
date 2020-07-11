@@ -5,6 +5,9 @@
 
 namespace ember::math {
 
+template <typename T, typename U = T>
+using op = U(&)(const T&);
+
 template <typename T>
 using rel = T(&)(const T&, const T&);
 
@@ -28,6 +31,8 @@ void register_types(sol::table& lua) {
     vec2_type[sol::meta_function::subtraction] = static_cast<rel<glm::vec2>>(glm::operator-);
     vec2_type[sol::meta_function::multiplication] = static_cast<rel_s<glm::vec2, float>>(glm::operator*);
     vec2_type["dot"] = static_cast<rel_r<glm::vec2, float>>(glm::dot);
+    vec2_type["normalized"] = static_cast<op<glm::vec2>>(glm::normalize);
+    vec2_type["length"] = static_cast<op<glm::vec2, float>>(glm::length);
 
     auto vec3_type = lua.new_usertype<glm::vec3>(
         "vec3",
@@ -46,6 +51,8 @@ void register_types(sol::table& lua) {
     vec3_type[sol::meta_function::multiplication] = static_cast<rel_s<glm::vec3, float>>(glm::operator*);
     vec3_type["dot"] = static_cast<rel_r<glm::vec3, float>>(glm::dot);
     vec3_type["cross"] = static_cast<rel<glm::vec3>>(glm::cross);
+    vec3_type["normalized"] = static_cast<op<glm::vec3>>(glm::normalize);
+    vec3_type["length"] = static_cast<op<glm::vec3, float>>(glm::length);
 
     auto vec4_type = lua.new_usertype<glm::vec4>(
         "vec4",
@@ -66,6 +73,8 @@ void register_types(sol::table& lua) {
     vec4_type[sol::meta_function::subtraction] = static_cast<rel<glm::vec4>>(glm::operator-);
     vec4_type[sol::meta_function::multiplication] = static_cast<rel_s<glm::vec4, const float&>>(glm::operator*);
     vec4_type["dot"] = static_cast<rel_r<glm::vec4, float>>(glm::dot);
+    vec4_type["normalized"] = static_cast<op<glm::vec4>>(glm::normalize);
+    vec4_type["length"] = static_cast<op<glm::vec4, float>>(glm::length);
 
     auto mat2_type = lua.new_usertype<glm::mat2>(
         "mat2", sol::constructors<glm::mat2(), glm::mat2(float), glm::mat2(const glm::mat2&)>{});
