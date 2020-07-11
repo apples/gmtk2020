@@ -30,8 +30,8 @@ local function make_ground()
         entities:add_component(eid, body)
     end
 
-    spawn_vertical_wall(30)
-    spawn_vertical_wall(-30)
+    spawn_vertical_wall(40)
+    spawn_vertical_wall(-40)
 end
 
 function scene.init()

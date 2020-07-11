@@ -65,11 +65,13 @@ void physics_system::step(ember::engine& engine, ember::database& entities, floa
                 auto h = overlap.top - overlap.bottom;
 
                 if (w > 0 && h > 0) {
-                    auto& a = obj;
-                    auto& b = *obj2;
-                    if (b.body->type < a.body->type) {
-                        std::swap(a, b);
+                    auto* ap = &obj;
+                    auto* bp = obj2;
+                    if (bp->body->type < ap->body->type) {
+                        std::swap(ap, bp);
                     }
+                    auto& a = *ap;
+                    auto& b = *bp;
 
                     // Pre-collide
                     if (auto b_script = entities.get_component<component::script*>(b.eid)) {
@@ -155,8 +157,8 @@ void physics_system::step(ember::engine& engine, ember::database& entities, floa
                                 resolve_y = -resolve_y;
                             }
                             b.transform->pos.y -= resolve_y;
-                            b.left -= resolve_y;
-                            b.right -= resolve_y;
+                            b.bottom -= resolve_y;
+                            b.top -= resolve_y;
                         }
                     }
 
