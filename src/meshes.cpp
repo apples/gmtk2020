@@ -97,3 +97,28 @@ auto get_tilemap_mesh(int width) -> sushi::mesh_group {
 
     return mb.get();
 }
+
+auto get_screen_mesh(float width, float height) -> sushi::mesh_group {
+    sushi::mesh_group_builder mb;
+    mb.enable(sushi::attrib_location::POSITION);
+    mb.enable(sushi::attrib_location::TEXCOORD);
+    mb.enable(sushi::attrib_location::NORMAL);
+
+    mb.mesh("tilemap");
+
+    auto left = -width/2;
+    auto right = width/2;
+    auto bottom = -height/2;
+    auto top = height/2;
+
+    auto bottomleft = mb.vertex().position({left, bottom, 0}).texcoord({0, 1}).normal({0, 1, 0}).get();
+    auto topleft = mb.vertex().position({left, top, 0}).texcoord({0, 0}).normal({0, 1, 0}).get();
+    auto bottomright = mb.vertex().position({right, bottom, 0}).texcoord({1, 1}).normal({0, 1, 0}).get();
+    auto topright = mb.vertex().position({right, top, 0}).texcoord({1, 0}).normal({0, 1, 0}).get();
+
+    mb.tri(bottomleft, topleft, topright);
+    mb.tri(topright, bottomright, bottomleft);
+
+
+    return mb.get();
+}

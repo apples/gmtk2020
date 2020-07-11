@@ -32,5 +32,6 @@ private:
     sol::table gui_state;
     sushi::mesh_group sprite_mesh;
     sushi::mesh_group tilemap_mesh;
+    sushi::mesh_group screen_mesh;
     int world_width;
 };
