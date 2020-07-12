@@ -288,6 +288,7 @@ void scene_gameplay::tick(float delta) {
 
     // Player UI meters
     ember::perf::start_section("scene_gameplay.player_ui");
+    gui_state["health"] = 0;
     entities.visit([&](const component::player& player, const component::health& health) {
         gui_state["health"] = health.current;
         gui_state["max_health"] = health.max;
