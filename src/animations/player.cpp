@@ -6,6 +6,7 @@ enum states {
     IDLE = 0,
     WALK = 1,
     SPRAY = 2,
+    PUMP = 3,
 };
 
 void player_animation::update(ember::database& entities, const ember::database::ent_id& eid) {
@@ -46,6 +47,14 @@ void player_animation::update(ember::database& entities, const ember::database::
             }
             break;
         }
+        case PUMP: {
+            if (sprite.time >= 0.5) {
+                set_state(IDLE);
+            } else if (sprite.time >= 4/24.f && std::abs(body.vel.x) > 0.001f) {
+                set_state(WALK);
+            }
+            break;
+        }
     }
 }
 
@@ -69,6 +78,15 @@ auto player_animation::get_frame(ember::database& entities, const ember::databas
         case SPRAY: {
             return {
                 "player_spray",
+                {0.25, 0.5},
+                {0, 0},
+                {1, 1},
+                std::min(int(sprite.time * 24), 4),
+            };
+        }
+        case PUMP: {
+            return {
+                "player_pump",
                 {0.25, 0.5},
                 {0, 0},
                 {1, 1},

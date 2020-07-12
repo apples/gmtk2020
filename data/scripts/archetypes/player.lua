@@ -4,6 +4,7 @@ return function()
 
     local transform = component.transform.new()
     transform.pos.y = 2
+    transform.pos.z = 1
 
     local body = component.body.new()
     body.type = 2
@@ -22,6 +23,8 @@ return function()
 
     local player = component.player.new()
 
+    local balloon_tracker = component.balloon_tracker.new()
+
     local eid = entities:create_entity()
     entities:add_component(eid, sprite)
     entities:add_component(eid, transform)
@@ -29,4 +32,5 @@ return function()
     entities:add_component(eid, controller)
     entities:add_component(eid, script)
     entities:add_component(eid, player)
+    entities:add_component(eid, balloon_tracker)
 end

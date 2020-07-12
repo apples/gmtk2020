@@ -11,6 +11,7 @@
 #include "animations/valuablePlant.hpp"
 #include "animations/projectile.hpp"
 #include "animations/gas.hpp"
+#include "animations/balloon_box.hpp"
 
 #include "ember/camera.hpp"
 #include "ember/engine.hpp"
@@ -53,6 +54,7 @@ scene_gameplay::scene_gameplay(ember::engine& engine, ember::scene* prev)
     animations["valuablePlant"] = std::make_shared<valuablePlant_animation>();
     animations["projectile"] = std::make_shared<projectile_animation>();
     animations["gas"] = std::make_shared<gas_animation>();
+    animations["balloon_box"] = std::make_shared<balloon_box_animation>();
 }
 
 // Scene initialization
@@ -148,6 +150,23 @@ void scene_gameplay::tick(float delta) {
     engine->call_script("systems.scripting", "visit", delta);
     ember::perf::end_section();
 
+    // Balloon tracker system
+    ember::perf::start_section("scene_gameplay.balloon_tracker");
+    entities.visit([&](component::balloon_tracker& tracker, const component::transform& transform) {
+        auto dist = 1.5f;
+        tracker.tracked = std::nullopt;
+        entities.visit([&](ember::database::ent_id eid,
+                           const component::balloon& balloon,
+                           const component::transform& balloon_transform) {
+            auto d = glm::length(balloon_transform.pos - transform.pos);
+            if (d < dist) {
+                tracker.tracked = eid;
+                dist = d;
+            }
+        });
+    });
+    ember::perf::end_section();
+
     // Physics system
     ember::perf::start_section("scene_gameplay.physics");
     physics.step(*engine, entities, delta);
@@ -209,6 +228,7 @@ void scene_gameplay::tick(float delta) {
     entities.visit([&](component::controller& con) {
         con.jump_pressed = false;
         con.action_pressed = false;
+        con.pump_pressed = false;
         con.sow_defensive = false;
         con.sow_valuable = false;
     });
@@ -375,6 +395,9 @@ auto scene_gameplay::handle_game_input(const SDL_Event& event) -> bool {
                 return true;
             case SDLK_x:
                 update(pressed, nullptr, &controller::action_pressed);
+                return true;
+            case SDLK_c:
+                update(pressed, nullptr, &controller::pump_pressed);
                 return true;
             case SDLK_q:
                 update(pressed, nullptr, &controller::sow_defensive);

@@ -50,7 +50,8 @@ struct body {
         PROJECTILE = 4,
         BUG = 5,
         GAS = 6,
-        N_TYPES = 6,
+        BOX = 7,
+        N_TYPES = 7,
     };
 
     type_t type;
@@ -72,11 +73,12 @@ struct controller {
     bool right = false;
     bool jump_pressed = false;
     bool action_pressed = false;
+    bool pump_pressed = false;
     bool sow_defensive = false;
     bool sow_valuable = false;
     bool collect = false;
 };
-REFLECT(controller, (left)(right)(jump_pressed)(action_pressed)(sow_defensive)(sow_valuable)(collect))
+REFLECT(controller, (left)(right)(jump_pressed)(action_pressed)(pump_pressed)(sow_defensive)(sow_valuable)(collect))
 
 struct player {
     glm::vec2 focus = {0, 0};
@@ -112,6 +114,16 @@ struct growth {
     int stage = 0;
 };
 REFLECT(growth, (growthTimer)(growTime)(stage))
+
+struct balloon {
+    int air = 0;
+};
+REFLECT(balloon, (air))
+
+struct balloon_tracker {
+    std::optional<ember::database::ent_id> tracked;
+};
+REFLECT(balloon_tracker, (tracked))
 
 } // namespace component
 

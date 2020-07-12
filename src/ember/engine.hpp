@@ -66,6 +66,7 @@ private:
     std::weak_ptr<gui::widget> focused_widget;
     sol::table gui_state;
     sol::function update_gui_state;
+    bool hide_ui;
 
     std::shared_ptr<scene> current_scene;
 
