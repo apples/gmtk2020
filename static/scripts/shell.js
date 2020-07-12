@@ -29,6 +29,25 @@ var spinnerElement = document.getElementById('spinner');
         event.target.style.cursor = 'default';
     };
 
+    // https://github.com/emscripten-core/emscripten/issues/6511#issuecomment-483039500
+    // Work-around chromium autoplay policy
+    // https://github.com/emscripten-core/emscripten/issues/6511
+    var resumeAudio = function(e) {
+        if (typeof Module === 'undefined'
+            || typeof Module.SDL2 == 'undefined'
+            || typeof Module.SDL2.audioContext == 'undefined')
+            return;
+        if (Module.SDL2.audioContext.state == 'suspended') {
+            Module.SDL2.audioContext.resume();
+        }
+        if (Module.SDL2.audioContext.state == 'running') {
+            document.getElementById('canvas').removeEventListener('click', resumeAudio);
+            document.removeEventListener('keydown', resumeAudio);
+        }
+    };
+    canvas.addEventListener('click', resumeAudio);
+    document.addEventListener('keydown', resumeAudio);
+
     body.addEventListener('keydown', preventScroll, false);
     body.addEventListener('click', activateCanvas, false);
     canvas.addEventListener('mousedown', handleMouseDown, false);

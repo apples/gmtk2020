@@ -5,6 +5,7 @@ function floaty_projectile.physics_pre_collide(eid, other)
         local health = entities:get_component(other, component.health)
         if health then
             health.current = health.current - 1
+            play_sfx('hurt', 1)
         end
     end
     entities:destroy_entity(eid)

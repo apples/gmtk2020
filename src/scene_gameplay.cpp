@@ -264,6 +264,7 @@ void scene_gameplay::tick(float delta) {
                 }
             }
             entities.destroy_entity(eid);
+            engine->lua["play_sfx"]("pew", 1.f);
         }
     });
     ember::perf::end_section();

@@ -11,6 +11,7 @@ function seed.physics_post_collide(eid, other)
             local sx = math.floor(transform.pos.x * 2) / 2
             local sy = math.floor(transform.pos.y * 2) / 2
             new_plant(sx, sy)
+            play_sfx('plant', 1)
         end
         entities:destroy_entity(eid)
     end

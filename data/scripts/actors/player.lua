@@ -73,6 +73,7 @@ function player.update(eid, delta)
         sprite.time = 0
         local gasdir = sprite.flip and 0.5 or -0.5
         new_gas(gasdir + transform.pos.x, transform.pos.y, gasdir * 2)
+        play_sfx('spray', 1)
     end
 
     if not is_acting and body.on_ground and controller.pump_pressed then
@@ -91,6 +92,7 @@ function player.update(eid, delta)
     if not is_acting and body.on_ground and controller.snip_pressed then
         sprite.state = 4
         sprite.time = 0
+        play_sfx('prune', 1)
         local plant = plant_at_position(transform.pos.x + (sprite.flip and 0.5 or -0.5), transform.pos.y)
         if plant then
             local growth = entities:get_component(plant, component.growth)
@@ -116,6 +118,7 @@ function player.update(eid, delta)
             set_currency(currency - 20)
 
             new_defensive_plant(math.floor(transform.pos.x * 2) / 2, math.floor((transform.pos.y - .5) * 2) / 2)
+            play_sfx('plant', 1)
         end
     end
 
@@ -126,6 +129,7 @@ function player.update(eid, delta)
             set_currency(currency - 20)
 
             new_valuable_plant(math.floor(transform.pos.x * 2) / 2, math.floor((transform.pos.y - .5) * 2) / 2)
+            play_sfx('plant', 1)
         end
     end
 

@@ -36,10 +36,12 @@ end
 function red_beetle.physics_post_collide(eid, other)
     if entities:has_component(other, component.plant_tag) then
         entities:destroy_entity(other)
+        play_sfx('prune', 1)
     else
         local health = entities:get_component(other, component.health)
         if health then
             health.current = health.current - 1
+            play_sfx('hurt', 1)
         end
     end
 end
