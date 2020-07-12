@@ -88,14 +88,15 @@ void scene_gameplay::init() {
 
         std::cout << "test0" << std::endl;
         entities.visit([&](ember::database::ent_id eid, component::valuable_tag, component::transform& trans, component::growth& grow) {
-            std::cout << std::to_string(trans.pos.x) + " " + std::to_string(snappedPos.x) + ": " + std::to_string(trans.pos.y) + " " + std::to_string(snappedPos.y) + ": " + std::to_string(grow.stage)<< std::endl;
             if(trans.pos.x == snappedPos.x && trans.pos.y == snappedPos.y && grow.stage > 0) {
-                std::cout << "test2" << std::endl;
                 Eid = eid;
                 grow.stage = 0;
+                grow.growthTimer = grow.growTime;
                 if (auto script = entities.get_component<component::script*>(eid)) {
                     engine->call_script("actors." + script->name, "grow", eid, grow.stage);
                 }
+
+                fruits++;
             }
         });
         return Eid;
@@ -235,6 +236,7 @@ void scene_gameplay::tick(float delta) {
     ember::perf::end_section();
 
     gui_state["currency"] = currency;
+    gui_state["fruits"] = fruits;
 }
 
 // Render function

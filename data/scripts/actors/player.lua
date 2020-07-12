@@ -77,6 +77,10 @@ function player.update(eid, delta)
             if balloon.air < 9 then
                 balloon.air = balloon.air + 1
             end
+            if balloon.air == 9 then
+                set_currency(currency + (10 * fruits))
+                set_fruits(0)
+            end
         else
             new_balloon_box(transform.pos.x, transform.pos.y)
         end
@@ -98,12 +102,12 @@ function player.update(eid, delta)
         end
     end
 
-    if controller.collect and fruits <= 10 then
+    if controller.collect and fruits < 10 then
         local eid = pick_fruit(transform.pos.x, transform.pos.y)
 
-        if eid then
-            set_fruits = fruits + 1;
-        end
+        -- if eid then
+        --     set_fruits = fruits + 1;
+        -- end
     end
 end
 

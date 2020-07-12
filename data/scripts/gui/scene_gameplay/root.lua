@@ -8,6 +8,13 @@ return function(props)
         height = 32,
         valign = 'top',
         halign = 'left',
+    }),
+    vdom.create_element('label', {
+        color = '#f00',
+        text = 'Fruit: ' .. props.fruits,
+        height = 32,
+        valign = 'top',
+        halign = 'center',
     })
     )
 end
