@@ -16,6 +16,7 @@ function balloon_box.update(eid, delta)
     if math.abs(transform.pos.x) > world_width / 2 then
         set_currency(get_currency() + balloon.fruits * 10)
         add_delivered(balloon.fruits)
+        play_sfx('cash', 1)
         entities:destroy_entity(eid)
     end
 end
