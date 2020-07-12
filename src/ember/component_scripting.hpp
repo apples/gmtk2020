@@ -51,6 +51,16 @@ auto has_component(database& db, database::ent_id eid) -> bool {
     return db.has_component<T>(eid);
 }
 
+template <typename T>
+void visit(database& db, const std::function<void(ent_id, T&)>& visitor) {
+    db.visit(visitor);
+}
+
+template <typename T>
+void visit_tag(database& db, const std::function<void(ent_id, T)>& visitor) {
+    db.visit(visitor);
+}
+
 } //namespace _detail
 
 template <typename T>
@@ -59,9 +69,11 @@ void register_usertype(scripting::token<T>, sol::usertype<T>& usertype) {
 
     if constexpr (is_tag<T>::value) {
         usertype["new"] = sol::constructors<T()>{};
+        usertype["_visit"] = &_detail::visit_tag<T>;
     } else {
         usertype["new"] = sol::constructors<T(), T(const T&)>{};
         usertype["_get_component"] = &_detail::get_component<T>;
+        usertype["_visit"] = &_detail::visit<T>;
     }
 
     usertype["_add_component"] = &_detail::add_component<T>;

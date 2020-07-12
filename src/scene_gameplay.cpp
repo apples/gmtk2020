@@ -64,6 +64,8 @@ void scene_gameplay::init() {
     // We want scripts to have access to the entities as a global variable, so it is set here.
     engine->lua["entities"] = std::ref(entities);
 
+    engine->lua["world_width"] = world_width;
+
     //engine->lua["currency"] = std::ref(currency);
     engine->lua["set_currency"] = [this](int c) { currency = c; };
     engine->lua["get_currency"] = [this]() { return currency; };
@@ -287,8 +289,14 @@ void scene_gameplay::render() {
 
     // Render entities
     ember::perf::start_section("scene_gameplay.render_entities");
+    const auto cam_w = camera.height*camera.aspect_ratio;
     entities.visit(
         [&](ember::database::ent_id eid, const component::sprite& sprite, const component::transform& transform) {
+            auto d = glm::abs(glm::vec3(glm::vec2(transform.pos), 0) - camera.pos);
+            if (d.x > cam_w/2 + 2 && d.y > camera.height/2 + 2) {
+                return;
+            }
+
             ember::perf::start_section("scene_gameplay.render_entities.get_anim_info");
             auto iter = animations.find(sprite.name);
             if (iter == end(animations)) {

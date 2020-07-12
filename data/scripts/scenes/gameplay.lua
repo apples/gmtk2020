@@ -50,7 +50,16 @@ function scene.init()
     new_plant(0, 1)
     new_plant2(2, 3)--remove me
     new_red_beetle(0, 5)
-    new_platform(10, 5)
+
+    print('Generating terrain...')
+    for i = 0, 200 do
+        local y = math.random(5, 600)
+        local w = math.random(2, 20)
+        local x1 = math.random(-world_width, world_width - w)
+        for x = x1, x1+w do
+            new_platform(x, y)
+        end
+    end
 
     print('Initialized gameplay.')
 end
