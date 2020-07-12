@@ -295,6 +295,7 @@ void scene_gameplay::tick(float delta) {
         con.jump_pressed = false;
         con.action_pressed = false;
         con.pump_pressed = false;
+        con.snip_pressed = false;
         con.sow_defensive = false;
         con.sow_valuable = false;
     });
@@ -484,6 +485,9 @@ auto scene_gameplay::handle_game_input(const SDL_Event& event) -> bool {
                 return true;
             case SDLK_c:
                 update(pressed, nullptr, &controller::pump_pressed);
+                return true;
+            case SDLK_f:
+                update(pressed, nullptr, &controller::snip_pressed);
                 return true;
             case SDLK_q:
                 update(pressed, nullptr, &controller::sow_defensive);

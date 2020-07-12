@@ -92,6 +92,11 @@ function player.update(eid, delta)
         end
     end
 
+    if not is_acting and body.on_ground and controller.snip_pressed then
+        sprite.state = 4
+        sprite.time = 0
+    end
+
     if body.on_ground and controller.sow_defensive and currency >= 20 then
         if not plant_at_position(transform.pos.x, transform.pos.y) then
             set_currency(currency - 20)
