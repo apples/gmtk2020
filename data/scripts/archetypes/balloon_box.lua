@@ -7,12 +7,14 @@ return function(x, y, dir)
     transform.pos.y = y
 
     local body = component.body.new()
-    body.type = 2
-    body.layer = 6
+    body.type = 0
+    body.layer = 7
     body.left = -0.5
     body.right  = 0.5
     body.bottom = -0.5
-    body.top = 1.5
+    body.top = 0.5
+    body.jump_through = true
+    body.carry = true
 
     local script = component.script.new()
     script.name = 'balloon_box'

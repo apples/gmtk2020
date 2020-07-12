@@ -14,6 +14,7 @@ return function()
     body.bottom = -0.5
     body.top = 0.5
     body.collides_with[2] = true
+    body.collides_with[7] = true
     body.accel.y = -10
 
     local controller = component.controller.new()

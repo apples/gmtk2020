@@ -171,7 +171,7 @@ void physics_system::step(ember::engine& engine, ember::database& entities, floa
                                     }
                                 } else {
                                     auto above = a.transform->pos.y < b.transform->pos.y;
-                                    if (!a.body->jump_through || above && b.body->vel.y < 0) {
+                                    if (!a.body->jump_through || above && b.body->vel.y < a.body->vel.y) {
                                         auto resolve_y = h;
                                         if (above) {
                                             resolve_y = -resolve_y;
@@ -181,6 +181,9 @@ void physics_system::step(ember::engine& engine, ember::database& entities, floa
                                         b.body->vel.y = 0;
                                         b.bottom -= resolve_y;
                                         b.top -= resolve_y;
+                                        if (a.body->carry) {
+                                            b.transform->pos += glm::vec3(a.body->vel * delta, 0);
+                                        }
                                     }
                                 }
                             } else if (a.body->type == type_t::KINEMATIC && b.body->type == type_t::KINEMATIC) {
