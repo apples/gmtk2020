@@ -62,7 +62,6 @@ void scene_gameplay::init() {
     // We want scripts to have access to the entities as a global variable, so it is set here.
     engine->lua["entities"] = std::ref(entities);
 
-    //engine->lua["currency"] = std::ref(currency);
     engine->lua["set_currency"] = [this](int c) { currency = c; };
     engine->lua["get_currency"] = [this]() { return currency; };
 
@@ -76,6 +75,8 @@ void scene_gameplay::init() {
         });
         return result;
     };
+
+
     // Call the "init" function in the "data/scripts/scenes/gameplay.lua" script, with no params.
     engine->call_script("scenes.gameplay", "init");
 
@@ -358,6 +359,9 @@ auto scene_gameplay::handle_game_input(const SDL_Event& event) -> bool {
                 return true;
             case SDLK_e:
                 update(pressed, nullptr, &controller::sow_valuable);
+                return true;
+            case SDLK_LSHIFT:
+                update(pressed, &controller::collect, nullptr);
                 return true;
             default:
                 return false;
