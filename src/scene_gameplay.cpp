@@ -399,6 +399,10 @@ auto scene_gameplay::handle_game_input(const SDL_Event& event) -> bool {
             case SDLK_d:
                 update(pressed, &controller::right, nullptr);
                 return true;
+            case SDLK_DOWN:
+            case SDLK_s:
+                update(pressed, &controller::down, nullptr);
+                return true;
             case SDLK_SPACE:
             case SDLK_UP:
             case SDLK_w:

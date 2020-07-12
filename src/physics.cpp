@@ -171,7 +171,8 @@ void physics_system::step(ember::engine& engine, ember::database& entities, floa
                                     }
                                 } else {
                                     auto above = a.transform->pos.y < b.transform->pos.y;
-                                    if (!a.body->jump_through || above && b.body->vel.y < a.body->vel.y) {
+                                    if (!a.body->jump_through ||
+                                        above && b.body->vel.y < a.body->vel.y && !b.body->pass_through) {
                                         auto resolve_y = h;
                                         if (above) {
                                             resolve_y = -resolve_y;

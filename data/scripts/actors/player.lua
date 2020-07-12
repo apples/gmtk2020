@@ -58,6 +58,12 @@ function player.update(eid, delta)
         player.focus.x = player.focus.x * math.pow(1 / focus_speed / focus_speed, delta)
     end
 
+    if not is_acting and controller.down then
+        body.pass_through = true
+    else
+        body.pass_through = false
+    end
+
     if body.on_ground and controller.jump_pressed then
         body.vel.y = 10
     end

@@ -66,14 +66,16 @@ struct body {
     glm::vec2 accel = {0, 0};
     glm::vec2 vel_damp = {0, 0};
     bool jump_through = false;
+    bool pass_through = false;
     bool carry = false;
     bool on_ground = false;
 };
-REFLECT(body, (type)(layer)(collides_with)(events_with)(left)(right)(bottom)(top)(vel)(accel)(vel_damp)(jump_through)(carry)(on_ground))
+REFLECT(body, (type)(layer)(collides_with)(events_with)(left)(right)(bottom)(top)(vel)(accel)(vel_damp)(jump_through)(pass_through)(carry)(on_ground))
 
 struct controller {
     bool left = false;
     bool right = false;
+    bool down = false;
     bool jump_pressed = false;
     bool action_pressed = false;
     bool pump_pressed = false;
@@ -81,7 +83,7 @@ struct controller {
     bool sow_valuable = false;
     bool collect = false;
 };
-REFLECT(controller, (left)(right)(jump_pressed)(action_pressed)(pump_pressed)(sow_defensive)(sow_valuable)(collect))
+REFLECT(controller, (left)(right)(down)(jump_pressed)(action_pressed)(pump_pressed)(sow_defensive)(sow_valuable)(collect))
 
 struct player {
     glm::vec2 focus = {0, 0};
