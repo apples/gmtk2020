@@ -27,8 +27,8 @@ return function()
     local balloon_tracker = component.balloon_tracker.new()
 
     local health = component.health.new()
-    health.max = 3
-    health.current = 3
+    health.max = 5
+    health.current = 5
     health.anim = true
 
     local eid = entities:create_entity()

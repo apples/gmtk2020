@@ -53,7 +53,7 @@ function scene.init()
     play_bgm('Beeswax', 1)
 
     print('Generating terrain...')
-    for i = 0, 200 do
+    for i = 0, 600 do
         local y = math.random(5, 600)
         local w = math.random(2, 20)
         local x1 = math.random(-world_width, world_width - w)
