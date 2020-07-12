@@ -165,23 +165,28 @@ void physics_system::step(ember::engine& engine, ember::database& entities, floa
                             }
                         } else if (b.body->type == type_t::DYNAMIC) {
                             if (w < h) {
-                                auto resolve_x = w;
-                                if (a.transform->pos.x < b.transform->pos.x) {
-                                    resolve_x = -resolve_x;
+                                if (!a.body->jump_through) {
+                                    auto resolve_x = w;
+                                    if (a.transform->pos.x < b.transform->pos.x) {
+                                        resolve_x = -resolve_x;
+                                    }
+                                    b.transform->pos.x -= resolve_x;
+                                    b.body->vel.x = 0;
+                                    b.left -= resolve_x;
+                                    b.right -= resolve_x;
                                 }
-                                b.transform->pos.x -= resolve_x;
-                                b.body->vel.x = 0;
-                                b.left -= resolve_x;
-                                b.right -= resolve_x;
                             } else {
-                                auto resolve_y = h;
-                                if (a.transform->pos.y < b.transform->pos.y) {
-                                    resolve_y = -resolve_y;
+                                auto above = a.transform->pos.y < b.transform->pos.y;
+                                if (!a.body->jump_through || above && b.body->vel.y < 0) {
+                                    auto resolve_y = h;
+                                    if (above) {
+                                        resolve_y = -resolve_y;
+                                    }
+                                    b.transform->pos.y -= resolve_y;
+                                    b.body->vel.y = 0;
+                                    b.bottom -= resolve_y;
+                                    b.top -= resolve_y;
                                 }
-                                b.transform->pos.y -= resolve_y;
-                                b.body->vel.y = 0;
-                                b.bottom -= resolve_y;
-                                b.top -= resolve_y;
                             }
                         } else if (a.body->type == type_t::KINEMATIC && b.body->type == type_t::KINEMATIC) {
                             throw std::runtime_error("Not implemented!");

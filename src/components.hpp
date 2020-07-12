@@ -65,8 +65,9 @@ struct body {
     glm::vec2 vel = {0, 0};
     glm::vec2 accel = {0, 0};
     glm::vec2 vel_damp = {0, 0};
+    bool jump_through = false;
 };
-REFLECT(body, (type)(layer)(collides_with)(events_with)(left)(right)(bottom)(top)(vel)(accel)(vel_damp))
+REFLECT(body, (type)(layer)(collides_with)(events_with)(left)(right)(bottom)(top)(vel)(accel)(vel_damp)(jump_through))
 
 struct controller {
     bool left = false;
