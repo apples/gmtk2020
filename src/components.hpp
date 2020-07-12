@@ -49,7 +49,8 @@ struct body {
         PLANT = 3,
         PROJECTILE = 4,
         BUG = 5,
-        N_TYPES = 5,
+        GAS = 6,
+        N_TYPES = 6,
     };
 
     type_t type;
@@ -70,10 +71,11 @@ struct controller {
     bool left = false;
     bool right = false;
     bool jump_pressed = false;
+    bool action_pressed = false;
     bool sow_defensive = false;
     bool sow_valuable = false;
 };
-REFLECT(controller, (left)(right)(jump_pressed)(sow_defensive)(sow_valuable))
+REFLECT(controller, (left)(right)(jump_pressed)(action_pressed)(sow_defensive)(sow_valuable))
 
 struct player {
     glm::vec2 focus = {0, 0};

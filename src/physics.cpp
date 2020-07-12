@@ -78,7 +78,10 @@ void physics_system::step(ember::engine& engine, ember::database& entities, floa
 
             ember::perf::start_section("physics.inner_loop");
             for (auto& obj2 : current) {
-                if (!collides_with(*obj.body, *obj2->body) && !collides_with(*obj2->body, *obj.body)) {
+                auto no_collide = !collides_with(*obj.body, *obj2->body) && !collides_with(*obj2->body, *obj.body);
+                auto no_event = !events_with(*obj.body, *obj2->body) && !events_with(*obj2->body, *obj.body);
+
+                if (no_collide && no_event) {
                     continue;
                 }
 
@@ -132,75 +135,77 @@ void physics_system::step(ember::engine& engine, ember::database& entities, floa
                     ember::perf::end_section();
 
                     // Collide
-                    ember::perf::start_section("physics.collide");
-                    if (a.body->type == type_t::DYNAMIC && b.body->type == type_t::DYNAMIC) {
-                        if (w < h) {
-                            auto resolve_x = w / 2;
-                            if (a.transform->pos.x < b.transform->pos.x) {
-                                resolve_x = -resolve_x;
+                    if (!no_collide) {
+                        ember::perf::start_section("physics.collide");
+                        if (a.body->type == type_t::DYNAMIC && b.body->type == type_t::DYNAMIC) {
+                            if (w < h) {
+                                auto resolve_x = w / 2;
+                                if (a.transform->pos.x < b.transform->pos.x) {
+                                    resolve_x = -resolve_x;
+                                }
+                                a.transform->pos.x += resolve_x;
+                                b.transform->pos.x -= resolve_x;
+                                std::swap(a.body->vel.x, b.body->vel.x);
+                                a.left += resolve_x;
+                                a.right += resolve_x;
+                                b.left -= resolve_x;
+                                b.right -= resolve_x;
+                            } else {
+                                auto resolve_y = h / 2;
+                                if (a.transform->pos.y < b.transform->pos.y) {
+                                    resolve_y = -resolve_y;
+                                }
+                                a.transform->pos.y += resolve_y;
+                                b.transform->pos.y -= resolve_y;
+                                std::swap(a.body->vel.y, b.body->vel.y);
+                                a.bottom += resolve_y;
+                                a.top += resolve_y;
+                                b.bottom -= resolve_y;
+                                b.top -= resolve_y;
                             }
-                            a.transform->pos.x += resolve_x;
-                            b.transform->pos.x -= resolve_x;
-                            std::swap(a.body->vel.x, b.body->vel.x);
-                            a.left += resolve_x;
-                            a.right += resolve_x;
-                            b.left -= resolve_x;
-                            b.right -= resolve_x;
-                        } else {
-                            auto resolve_y = h / 2;
-                            if (a.transform->pos.y < b.transform->pos.y) {
-                                resolve_y = -resolve_y;
+                        } else if (b.body->type == type_t::DYNAMIC) {
+                            if (w < h) {
+                                auto resolve_x = w;
+                                if (a.transform->pos.x < b.transform->pos.x) {
+                                    resolve_x = -resolve_x;
+                                }
+                                b.transform->pos.x -= resolve_x;
+                                b.body->vel.x = 0;
+                                b.left -= resolve_x;
+                                b.right -= resolve_x;
+                            } else {
+                                auto resolve_y = h;
+                                if (a.transform->pos.y < b.transform->pos.y) {
+                                    resolve_y = -resolve_y;
+                                }
+                                b.transform->pos.y -= resolve_y;
+                                b.body->vel.y = 0;
+                                b.bottom -= resolve_y;
+                                b.top -= resolve_y;
                             }
-                            a.transform->pos.y += resolve_y;
-                            b.transform->pos.y -= resolve_y;
-                            std::swap(a.body->vel.y, b.body->vel.y);
-                            a.bottom += resolve_y;
-                            a.top += resolve_y;
-                            b.bottom -= resolve_y;
-                            b.top -= resolve_y;
+                        } else if (a.body->type == type_t::KINEMATIC && b.body->type == type_t::KINEMATIC) {
+                            throw std::runtime_error("Not implemented!");
+                        } else if (b.body->type == type_t::KINEMATIC) {
+                            if (w < h) {
+                                auto resolve_x = w;
+                                if (a.transform->pos.x < b.transform->pos.x) {
+                                    resolve_x = -resolve_x;
+                                }
+                                b.transform->pos.x -= resolve_x;
+                                b.left -= resolve_x;
+                                b.right -= resolve_x;
+                            } else {
+                                auto resolve_y = h;
+                                if (a.transform->pos.y < b.transform->pos.y) {
+                                    resolve_y = -resolve_y;
+                                }
+                                b.transform->pos.y -= resolve_y;
+                                b.bottom -= resolve_y;
+                                b.top -= resolve_y;
+                            }
                         }
-                    } else if (b.body->type == type_t::DYNAMIC) {
-                        if (w < h) {
-                            auto resolve_x = w;
-                            if (a.transform->pos.x < b.transform->pos.x) {
-                                resolve_x = -resolve_x;
-                            }
-                            b.transform->pos.x -= resolve_x;
-                            b.body->vel.x = 0;
-                            b.left -= resolve_x;
-                            b.right -= resolve_x;
-                        } else {
-                            auto resolve_y = h;
-                            if (a.transform->pos.y < b.transform->pos.y) {
-                                resolve_y = -resolve_y;
-                            }
-                            b.transform->pos.y -= resolve_y;
-                            b.body->vel.y = 0;
-                            b.bottom -= resolve_y;
-                            b.top -= resolve_y;
-                        }
-                    } else if (a.body->type == type_t::KINEMATIC && b.body->type == type_t::KINEMATIC) {
-                        throw std::runtime_error("Not implemented!");
-                    } else if (b.body->type == type_t::KINEMATIC) {
-                        if (w < h) {
-                            auto resolve_x = w;
-                            if (a.transform->pos.x < b.transform->pos.x) {
-                                resolve_x = -resolve_x;
-                            }
-                            b.transform->pos.x -= resolve_x;
-                            b.left -= resolve_x;
-                            b.right -= resolve_x;
-                        } else {
-                            auto resolve_y = h;
-                            if (a.transform->pos.y < b.transform->pos.y) {
-                                resolve_y = -resolve_y;
-                            }
-                            b.transform->pos.y -= resolve_y;
-                            b.bottom -= resolve_y;
-                            b.top -= resolve_y;
-                        }
+                        ember::perf::end_section();
                     }
-                    ember::perf::end_section();
 
                     // Post-collide
                     ember::perf::start_section("physics.post_collide");

@@ -9,6 +9,7 @@
 #include "animations/red_beetle.hpp"
 #include "animations/defensivePlant.hpp"
 #include "animations/projectile.hpp"
+#include "animations/gas.hpp"
 
 #include "ember/camera.hpp"
 #include "ember/engine.hpp"
@@ -48,6 +49,7 @@ scene_gameplay::scene_gameplay(ember::engine& engine, ember::scene* prev)
     animations["red_beetle"] = std::make_shared<red_beetle_animation>();
     animations["defensivePlant"] = std::make_shared<defensivePlant_animation>();
     animations["projectile"] = std::make_shared<projectile_animation>();
+    animations["gas"] = std::make_shared<gas_animation>();
 }
 
 // Scene initialization
@@ -181,6 +183,7 @@ void scene_gameplay::tick(float delta) {
     ember::perf::start_section("scene_gameplay.reset_controllers");
     entities.visit([&](component::controller& con) {
         con.jump_pressed = false;
+        con.action_pressed = false;
         con.sow_defensive = false;
         con.sow_valuable = false;
     });
@@ -344,6 +347,9 @@ auto scene_gameplay::handle_game_input(const SDL_Event& event) -> bool {
             case SDLK_w:
             case SDLK_z:
                 update(pressed, nullptr, &controller::jump_pressed);
+                return true;
+            case SDLK_x:
+                update(pressed, nullptr, &controller::action_pressed);
                 return true;
             case SDLK_q:
                 update(pressed, nullptr, &controller::sow_defensive);
