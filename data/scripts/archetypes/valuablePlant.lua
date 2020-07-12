@@ -8,7 +8,7 @@ return function(x, y)
 
     local body = component.body.new()
     body.type = 0
-    body.layer = 2
+    body.layer = 3
     body.left = -0.5
     body.right  = 0.5
     body.bottom = 0

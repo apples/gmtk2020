@@ -44,11 +44,11 @@ struct body {
     };
 
     enum layer_t {
-        PLAYER = 0,
-        WALL = 1,
-        PLANT = 2,
-        PROJECTILE = 3,
-        BUG = 4,
+        PLAYER = 1,
+        WALL = 2,
+        PLANT = 3,
+        PROJECTILE = 4,
+        BUG = 5,
         N_TYPES = 5,
     };
 

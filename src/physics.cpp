@@ -10,11 +10,11 @@ void physics_system::step(ember::engine& engine, ember::database& entities, floa
     delta = 1.f/120.f;
 
     auto collides_with = [&](const component::body& a, const component::body& b) {
-        return a.collides_with[b.layer];
+        return a.collides_with[b.layer - 1];
     };
 
     auto events_with = [&](const component::body& a, const component::body& b) {
-        return a.events_with[b.layer];
+        return a.events_with[b.layer - 1];
     };
 
     auto n_steps = int(time / delta);
