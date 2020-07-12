@@ -157,6 +157,8 @@ engine::engine(const config::config& config) {
         font_cache,
         mesh_cache,
         texture_cache);
+    
+    hide_ui = false;
 
     root_widget = std::make_shared<gui::widget>(renderer);
     root_widget->set_attribute("width", std::to_string(display.width));

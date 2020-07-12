@@ -42,6 +42,9 @@ void engine::tick() try {
             perf::enable(!perf::is_enabled());
             std::cout << "Toggled perf\n";
         }
+        if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_o && (event.key.keysym.mod & KMOD_CTRL)) {
+            hide_ui = !hide_ui;
+        }
         if (handle_gui_input(event))
             continue;
         if (handle_game_input(event))
@@ -80,9 +83,11 @@ void engine::tick() try {
 
     gui::calculate_all_layouts(*root_widget);
 
-    renderer.begin();
-    gui::draw_all(*root_widget);
-    renderer.end();
+    if (!hide_ui) {
+        renderer.begin();
+        gui::draw_all(*root_widget);
+        renderer.end();
+    }
 
     perf::end_section();
 

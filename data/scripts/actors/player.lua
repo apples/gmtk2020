@@ -1,6 +1,7 @@
 local new_defensive_plant = require('archetypes.defensivePlant')
 local new_valuable_plant = require('archetypes.valuablePlant')
 local new_gas = require('archetypes.gas')
+local new_balloon_box = require('archetypes.balloon_box')
 
 local player = {}
 
@@ -10,19 +11,22 @@ function player.update(eid, delta)
     local transform = entities:get_component(eid, component.transform)
     local player = entities:get_component(eid, component.player)
     local sprite = entities:get_component(eid, component.sprite)
+    local tracker = entities:get_component(eid, component.balloon_tracker)
     local currency = get_currency()
 
     local max_speed = 8
     local focus_speed = 5
     local acceleration = 150
 
-    local is_spraying = sprite.state == 2 and sprite.time < 4/24
+    local is_acting =
+        sprite.state == 2 and sprite.time < 4/24 or
+        sprite.state == 3 and sprite.time < 4/24
 
-    if not is_spraying and controller.left then
+    if not is_acting and controller.left then
         local to_max = math.abs(-max_speed - body.vel.x)
         local acc = math.min(to_max, delta * acceleration)
         body.vel.x = body.vel.x - acc
-    elseif not is_spraying and controller.right then
+    elseif not is_acting and controller.right then
         local to_max = math.abs(max_speed - body.vel.x)
         local acc = math.min(to_max, delta * acceleration)
         body.vel.x = body.vel.x + acc
@@ -57,11 +61,24 @@ function player.update(eid, delta)
         body.vel.y = 10
     end
 
-    if not is_spraying and controller.action_pressed then
+    if not is_acting and controller.action_pressed then
         sprite.state = 2
         sprite.time = 0
         local gasdir = sprite.flip and 0.5 or -0.5
         new_gas(gasdir + transform.pos.x, transform.pos.y, gasdir * 2)
+    end
+
+    if not is_acting and controller.pump_pressed then
+        if tracker.tracked then
+            sprite.state = 3
+            sprite.time = 0
+            local balloon = entities:get_component(tracker.tracked, component.balloon)
+            if balloon.air < 9 then
+                balloon.air = balloon.air + 1
+            end
+        else
+            new_balloon_box(transform.pos.x, transform.pos.y)
+        end
     end
 
     if controller.sow_defensive and currency >= 20 then
