@@ -50,6 +50,8 @@ function scene.init()
     make_ground()
     new_beetle_spawner()
 
+    play_bgm('Beeswax', 1)
+
     print('Generating terrain...')
     for i = 0, 200 do
         local y = math.random(5, 600)
