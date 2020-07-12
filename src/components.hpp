@@ -125,8 +125,8 @@ struct health {
 REFLECT(health, (current)(max)(anim))
 
 struct growth {
-    float growthTimer = 1;
-    float growTime = 1;//how long it should take to mature again
+    float growthTimer = 5;
+    float growTime = 5;//how long it should take to mature again
     int stage = 0;
 };
 REFLECT(growth, (growthTimer)(growTime)(stage))
