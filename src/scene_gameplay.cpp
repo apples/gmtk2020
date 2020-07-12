@@ -139,6 +139,18 @@ void scene_gameplay::tick(float delta) {
     });
     ember::perf::end_section();
 
+    // Growth system
+    entities.visit([&](ember::database::ent_id eid, component::growth& growth) {
+        growth.growthTimer -= delta;
+        if (growth.growthTimer <= 0) {
+            growth.stage++;
+            if (auto script = entities.get_component<component::script*>(eid)) {
+                engine->call_script("actors." + script->name, "grow", eid, growth.stage);
+            }
+            growth.growthTimer = growth.growTime;
+        }
+    });
+
     // Camera system
     ember::perf::start_section("scene_gameplay.camera");
     entities.visit([&](const component::player& player, const component::transform& transform) {
