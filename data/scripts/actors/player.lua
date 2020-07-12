@@ -95,6 +95,24 @@ function player.update(eid, delta)
     if not is_acting and body.on_ground and controller.snip_pressed then
         sprite.state = 4
         sprite.time = 0
+        local plant = plant_at_position(transform.pos.x + (sprite.flip and 0.5 or -0.5), transform.pos.y)
+        if plant then
+            local growth = entities:get_component(plant, component.growth)
+            if growth then
+                growth.stage = growth.stage - 1
+                if growth.stage < 0 then
+                    entities:destroy_entity(plant)
+                else
+                    local script = entities:get_component(plant, component.script)
+                    if script then
+                        local script_m = require('actors.' .. script.name)
+                        if script_m.grow then
+                            script_m.grow(plant, growth.stage)
+                        end
+                    end
+                end
+            end
+        end
     end
 
     if body.on_ground and controller.sow_defensive and currency >= 20 then

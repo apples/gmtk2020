@@ -15,7 +15,12 @@ function defensivePlant.grow(eid, stage)
     local shooter = entities:get_component(eid, component.shooter)
     local growth = entities:get_component(eid, component.growth)
     
-    if(stage == 1) then
+    if(stage == 0) then
+        sprite.state = 0
+        body.top = 0.25
+        shooter.cooldown = 4
+        growth.growTime = 5
+    elseif(stage == 1) then
         sprite.state = 1
         body.top = 1.0
         shooter.cooldown = 2

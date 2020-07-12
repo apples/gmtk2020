@@ -78,10 +78,10 @@ void scene_gameplay::init() {
 
     engine->lua["plant_at_position"] = [this](float x, float y) {
         auto snappedPos = glm::vec2(std::floor(x * 2) / 2, std::floor((y - .5) * 2) / 2);
-        bool result = false;
-        entities.visit([&](component::plant_tag, component::transform& trans) {
-            if(trans.pos.x == snappedPos.x && trans.pos.y == snappedPos.y) {
-                result = true;
+        std::optional<ember::database::ent_id> result = std::nullopt;
+        entities.visit([&](ember::database::ent_id eid, component::plant_tag, component::transform& trans) {
+            if(glm::length(glm::vec2(trans.pos) - snappedPos) < 0.1f) {
+                result = eid;
             }
         });
         return result;
