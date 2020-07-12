@@ -39,8 +39,9 @@ function red_beetle.physics_post_collide(eid, other)
         play_sfx('prune', 1)
     else
         local health = entities:get_component(other, component.health)
-        if health then
+        if health and not health.invulnerable then
             health.current = health.current - 1
+            health.invulnerable_time = 1
             play_sfx('hurt', 1)
         end
     end
