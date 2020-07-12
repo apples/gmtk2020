@@ -25,6 +25,7 @@ void physics_system::step(ember::engine& engine, ember::database& entities, floa
         entities.visit([&](ember::database::ent_id eid, component::body& body, component::transform& transform){
             body.vel *= glm::pow(glm::vec2{1, 1} - body.vel_damp, glm::vec2{delta, delta});
             body.vel += body.accel * delta;
+            body.on_ground = false;
             transform.pos += glm::vec3{body.vel * delta, 0};
             auto bucket_i_from = int((transform.pos.y + body.bottom) / 20.f);
             auto bucket_i_to = int((transform.pos.y + body.top) / 20.f);
@@ -144,6 +145,9 @@ void physics_system::step(ember::engine& engine, ember::database& entities, floa
                                     auto resolve_y = h / 2;
                                     if (a.transform->pos.y < b.transform->pos.y) {
                                         resolve_y = -resolve_y;
+                                        b.body->on_ground = true;
+                                    } else {
+                                        a.body->on_ground = true;
                                     }
                                     a.transform->pos.y += resolve_y;
                                     b.transform->pos.y -= resolve_y;
@@ -171,6 +175,7 @@ void physics_system::step(ember::engine& engine, ember::database& entities, floa
                                         auto resolve_y = h;
                                         if (above) {
                                             resolve_y = -resolve_y;
+                                            b.body->on_ground = true;
                                         }
                                         b.transform->pos.y -= resolve_y;
                                         b.body->vel.y = 0;

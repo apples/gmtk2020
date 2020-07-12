@@ -22,7 +22,7 @@ function player.update(eid, delta)
     local is_acting =
         sprite.state == 2 and sprite.time < 4/24 or
         sprite.state == 3 and sprite.time < 4/24
-
+    
     if not is_acting and controller.left then
         local to_max = math.abs(-max_speed - body.vel.x)
         local acc = math.min(to_max, delta * acceleration)
@@ -58,7 +58,7 @@ function player.update(eid, delta)
         player.focus.x = player.focus.x * math.pow(1 / focus_speed / focus_speed, delta)
     end
 
-    if controller.jump_pressed then
+    if body.on_ground and controller.jump_pressed then
         body.vel.y = 10
     end
 
@@ -69,7 +69,7 @@ function player.update(eid, delta)
         new_gas(gasdir + transform.pos.x, transform.pos.y, gasdir * 2)
     end
 
-    if not is_acting and controller.pump_pressed then
+    if not is_acting and body.on_ground and controller.pump_pressed then
         if tracker.tracked then
             sprite.state = 3
             sprite.time = 0
@@ -86,7 +86,7 @@ function player.update(eid, delta)
         end
     end
 
-    if controller.sow_defensive and currency >= 20 then
+    if body.on_ground and controller.sow_defensive and currency >= 20 then
         if not plant_at_position(transform.pos.x, transform.pos.y) then
             set_currency(currency - 20)
 
@@ -94,7 +94,7 @@ function player.update(eid, delta)
         end
     end
 
-    if controller.sow_valuable and currency >= 20 then
+    if body.on_ground and controller.sow_valuable and currency >= 20 then
         if not plant_at_position(transform.pos.x, transform.pos.y) and
             not plant_at_position(transform.pos.x + .5, transform.pos.y) and
             not plant_at_position(transform.pos.x - .5, transform.pos.y) then
