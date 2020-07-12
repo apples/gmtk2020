@@ -7,9 +7,16 @@ function floaty_projectile.physics_pre_collide(eid, other)
             health.current = health.current - 1
             health.invulnerable_time = 1
             play_sfx('hurt', 1)
+            entities:destroy_entity(eid)
         end
     end
-    entities:destroy_entity(eid)
+end
+
+function floaty_projectile.physics_post_collide(eid, other)
+    local body = entities:get_component(eid, component.body)
+    if body.on_ground then
+        entities:destroy_entity(eid)
+    end
 end
 
 return floaty_projectile
