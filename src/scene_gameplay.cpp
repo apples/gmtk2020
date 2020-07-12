@@ -104,6 +104,8 @@ void scene_gameplay::init() {
         return Eid;
     };
 
+    engine->lua["math"]["randomseed"](rng());
+
     // Call the "init" function in the "data/scripts/scenes/gameplay.lua" script, with no params.
     engine->call_script("scenes.gameplay", "init");
 
