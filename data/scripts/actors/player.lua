@@ -95,7 +95,9 @@ function player.update(eid, delta)
     end
 
     if controller.sow_valuable and currency >= 20 then
-        if not plant_at_position(transform.pos.x, transform.pos.y) then
+        if not plant_at_position(transform.pos.x, transform.pos.y) and
+            not plant_at_position(transform.pos.x + .5, transform.pos.y) and
+            not plant_at_position(transform.pos.x - .5, transform.pos.y) then
             set_currency(currency - 20)
 
             new_valuable_plant(math.floor(transform.pos.x * 2) / 2, math.floor((transform.pos.y - .5) * 2) / 2)
