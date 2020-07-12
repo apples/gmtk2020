@@ -30,6 +30,7 @@ private:
     ember::camera::orthographic camera;
     ember::database entities;
     int currency;
+    int fruits;
     physics_system physics;
     sol::table gui_state;
     sushi::mesh_group sprite_mesh;

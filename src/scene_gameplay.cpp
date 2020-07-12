@@ -31,6 +31,7 @@ scene_gameplay::scene_gameplay(ember::engine& engine, ember::scene* prev)
       camera(), // Camera has a sane default constructor, it is tweaked below
       entities(), // Entity database has no constructor parameters
       currency(),
+      fruits(),
       physics(), // Physics system
       gui_state{engine.lua.create_table()}, // Gui state is initialized to an empty Lua table
       sprite_mesh{get_sprite_mesh()}, // Sprite and tilemap meshes is created statically
@@ -66,9 +67,11 @@ void scene_gameplay::init() {
 
     engine->lua["world_width"] = world_width;
 
-    //engine->lua["currency"] = std::ref(currency);
     engine->lua["set_currency"] = [this](int c) { currency = c; };
     engine->lua["get_currency"] = [this]() { return currency; };
+
+    engine->lua["set_fruits"] = [this](int c) { fruits = c; };
+    engine->lua["get_fruits"] = [this]() { return fruits; };
 
     engine->lua["plant_at_position"] = [this](float x, float y) {
         auto snappedPos = glm::vec2(std::floor(x * 2) / 2, std::floor((y - .5) * 2) / 2);
@@ -80,6 +83,27 @@ void scene_gameplay::init() {
         });
         return result;
     };
+
+    engine->lua["pick_fruit"] = [this](float x, float y) {
+        auto snappedPos = glm::vec2(std::floor(x * 2) / 2, std::floor((y - .5) * 2) / 2);
+        std::optional<ember::database::ent_id> Eid = std::nullopt;
+
+        std::cout << "test0" << std::endl;
+        entities.visit([&](ember::database::ent_id eid, component::valuable_tag, component::transform& trans, component::growth& grow) {
+            if(trans.pos.x == snappedPos.x && trans.pos.y == snappedPos.y && grow.stage > 0) {
+                Eid = eid;
+                grow.stage = 0;
+                grow.growthTimer = grow.growTime;
+                if (auto script = entities.get_component<component::script*>(eid)) {
+                    engine->call_script("actors." + script->name, "grow", eid, grow.stage);
+                }
+
+                fruits++;
+            }
+        });
+        return Eid;
+    };
+
     // Call the "init" function in the "data/scripts/scenes/gameplay.lua" script, with no params.
     engine->call_script("scenes.gameplay", "init");
 
@@ -214,6 +238,7 @@ void scene_gameplay::tick(float delta) {
     ember::perf::end_section();
 
     gui_state["currency"] = currency;
+    gui_state["fruits"] = fruits;
 }
 
 // Render function
@@ -389,6 +414,9 @@ auto scene_gameplay::handle_game_input(const SDL_Event& event) -> bool {
                 return true;
             case SDLK_e:
                 update(pressed, nullptr, &controller::sow_valuable);
+                return true;
+            case SDLK_LSHIFT:
+                update(pressed, &controller::collect, nullptr);
                 return true;
             default:
                 return false;

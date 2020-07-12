@@ -28,4 +28,5 @@ return function(x, y)
     entities:add_component(eid, script)
     entities:add_component(eid, growth)
     entities:add_component(eid, component.plant_tag.new())
+    entities:add_component(eid, component.valuable_tag.new())
 end

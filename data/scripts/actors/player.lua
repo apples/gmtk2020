@@ -13,6 +13,7 @@ function player.update(eid, delta)
     local sprite = entities:get_component(eid, component.sprite)
     local tracker = entities:get_component(eid, component.balloon_tracker)
     local currency = get_currency()
+    local fruits = get_fruits()
 
     local max_speed = 8
     local focus_speed = 5
@@ -76,6 +77,10 @@ function player.update(eid, delta)
             if balloon.air < 9 then
                 balloon.air = balloon.air + 1
             end
+            if balloon.air == 9 then
+                set_currency(currency + (10 * fruits))
+                set_fruits(0)
+            end
         else
             new_balloon_box(transform.pos.x, transform.pos.y)
         end
@@ -87,16 +92,24 @@ function player.update(eid, delta)
 
             new_defensive_plant(math.floor(transform.pos.x * 2) / 2, math.floor((transform.pos.y - .5) * 2) / 2)
         end
-        
     end
 
     if controller.sow_valuable and currency >= 20 then
-        if not plant_at_position(transform.pos.x, transform.pos.y) then
+        if not plant_at_position(transform.pos.x, transform.pos.y) and
+            not plant_at_position(transform.pos.x + .5, transform.pos.y) and
+            not plant_at_position(transform.pos.x - .5, transform.pos.y) then
             set_currency(currency - 20)
 
             new_valuable_plant(math.floor(transform.pos.x * 2) / 2, math.floor((transform.pos.y - .5) * 2) / 2)
         end
-        
+    end
+
+    if controller.collect and fruits < 10 then
+        local eid = pick_fruit(transform.pos.x, transform.pos.y)
+
+        -- if eid then
+        --     set_fruits = fruits + 1;
+        -- end
     end
 end
 

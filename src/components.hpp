@@ -77,8 +77,9 @@ struct controller {
     bool pump_pressed = false;
     bool sow_defensive = false;
     bool sow_valuable = false;
+    bool collect = false;
 };
-REFLECT(controller, (left)(right)(jump_pressed)(action_pressed)(pump_pressed)(sow_defensive)(sow_valuable))
+REFLECT(controller, (left)(right)(jump_pressed)(action_pressed)(pump_pressed)(sow_defensive)(sow_valuable)(collect))
 
 struct player {
     glm::vec2 focus = {0, 0};
@@ -92,6 +93,9 @@ REFLECT(targeting, (target))
 
 using plant_tag = ginseng::tag<struct plant_tag_T>;
 REFLECT(plant_tag)
+
+using valuable_tag = ginseng::tag<struct valuable_tag_T>;
+REFLECT(valuable_tag)
 
 struct shooter {
     float cooldown = 1;
