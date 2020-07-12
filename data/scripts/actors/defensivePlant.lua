@@ -28,6 +28,7 @@ function defensivePlant.grow(eid, stage)
         body.top = 0.25
         shooter.cooldown = 4
         growth.growTime = 5
+        -- Remove seeder if exists
         if entities:has_component(eid, component.seeder) then
             entities:remove_component(eid, component.seeder)
         end
@@ -36,6 +37,7 @@ function defensivePlant.grow(eid, stage)
         body.top = 1.0
         shooter.cooldown = 2
         growth.growTime = 10
+        -- Remove seeder if exists
         if entities:has_component(eid, component.seeder) then
             entities:remove_component(eid, component.seeder)
         end
@@ -44,6 +46,7 @@ function defensivePlant.grow(eid, stage)
         body.top = 1.0
         shooter.cooldown = 1
         growth.growTime = 15
+        -- Remove seeder if exists
         if entities:has_component(eid, component.seeder) then
             entities:remove_component(eid, component.seeder)
         end
@@ -53,6 +56,7 @@ function defensivePlant.grow(eid, stage)
         shooter.cooldown = 0.5
         growth.growTime = 20
 
+        -- Become seeder
         local seeder = component.seeder.new()
         seeder.cooldown = 4
         seeder.cooldown_timer = 4
