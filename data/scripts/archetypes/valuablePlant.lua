@@ -9,10 +9,10 @@ return function(x, y)
     local body = component.body.new()
     body.type = 0
     body.layer = 2
-    body.left = -0.25
-    body.right  = 0.25
+    body.left = -0.5
+    body.right  = 0.5
     body.bottom = 0
-    body.top = 0.25
+    body.top = 1.0
     --body.collides_with[3] = true
     --body.accel.y = -10
 
