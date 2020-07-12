@@ -121,6 +121,17 @@ void scene_gameplay::init() {
 // Updates gui_state as necessary.
 // Basically does everything except rendering.
 void scene_gameplay::tick(float delta) {
+    // Timer system
+    ember::perf::start_section("scene_gameplay.timer");
+    entities.visit([&](ember::database::ent_id eid, component::timer& timer, const component::script& script) {
+        bool edge = timer.time > 0;
+        timer.time -= delta;
+        if (timer.time <= 0 && edge) {
+            engine->call_script("actors." + script.name, "timer", eid, timer);
+        }
+    });
+    ember::perf::end_section();
+
     // Targeting system
     ember::perf::start_section("scene_gameplay.targeting");
     entities.visit([&](component::targeting& targeting) {

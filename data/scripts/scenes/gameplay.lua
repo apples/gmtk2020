@@ -3,6 +3,7 @@ local new_plant = require('archetypes.defensivePlant')
 local new_plant2 = require('archetypes.valuablePlant')
 local new_red_beetle = require('archetypes.red_beetle')
 local new_platform = require('archetypes.platform')
+local new_beetle_spawner = require('archetypes.beetle_spawner')
 
 local scene = {}
 
@@ -47,9 +48,7 @@ function scene.init()
 
     new_player()
     make_ground()
-    new_plant(0, 1)
-    new_plant2(2, 3)--remove me
-    new_red_beetle(0, 5)
+    new_beetle_spawner()
 
     print('Generating terrain...')
     for i = 0, 200 do

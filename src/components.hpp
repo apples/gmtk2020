@@ -149,6 +149,11 @@ struct death_anim {
 };
 REFLECT(death_anim, (base_info)(vel))
 
+struct timer {
+    float time = 0;
+};
+REFLECT(timer, (time))
+
 } // namespace component
 
 #include "ember/reflection_end.hpp"
