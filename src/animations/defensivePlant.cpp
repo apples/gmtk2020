@@ -18,13 +18,6 @@ void defensivePlant_animation::update(ember::database& entities, const ember::da
         sprite.state = s;
         sprite.time = 0;
     };
-
-    // Process state
-    switch (sprite.state) {
-        //case GROWTH1: {
-            break;
-        //}
-    }
 }
 
 auto defensivePlant_animation::get_frame(ember::database& entities, const ember::database::ent_id& eid) -> animation_info {

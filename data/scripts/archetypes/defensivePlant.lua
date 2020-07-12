@@ -19,8 +19,11 @@ return function(x, y)
     script.name = 'defensivePlant'
 
     local shooter = component.shooter.new()
+    shooter.cooldown = 4
     
     local growth = component.growth.new()
+    growth.growthTimer = 5
+    growth.growTime = 5
 
     local eid = entities:create_entity()
     entities:add_component(eid, sprite)

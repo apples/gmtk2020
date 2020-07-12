@@ -9,16 +9,32 @@ function player.update(eid, delta)
     local player = entities:get_component(eid, component.player)
     local currency = get_currency()
 
-    local focus_speed = 15
+    local max_speed = 8
+    local focus_speed = 5
+    local acceleration = 150
 
     if controller.left then
-        body.vel.x = -15
-        player.focus.x = math.max(player.focus.x - delta * focus_speed, -3)
+        local to_max = math.abs(-max_speed - body.vel.x)
+        local acc = math.min(to_max, delta * acceleration)
+        body.vel.x = body.vel.x - acc
+        local fs = focus_speed * delta
+        player.focus.x = math.max(player.focus.x - fs, -3)
     elseif controller.right then
-        body.vel.x = 15
-        player.focus.x = math.min(player.focus.x + delta * focus_speed, 3)
+        local to_max = math.abs(max_speed - body.vel.x)
+        local acc = math.min(to_max, delta * acceleration)
+        body.vel.x = body.vel.x + acc
+        local fs = focus_speed * delta
+        player.focus.x = math.min(player.focus.x + fs, 3)
     else
-        body.vel.x = 0
+        local to_max = math.abs(body.vel.x)
+        local acc = math.min(to_max, delta * acceleration)
+        if body.vel.x > 0 then
+            body.vel.x = body.vel.x - acc
+        else
+            body.vel.x = body.vel.x + acc
+        end
+        local fs = focus_speed * acc / acceleration
+        player.focus.x = player.focus.x * math.pow(1 / focus_speed / focus_speed, delta)
     end
 
     if controller.jump_pressed then
