@@ -66,6 +66,7 @@ function player.update(eid, delta)
 
     if body.on_ground and controller.jump_pressed then
         body.vel.y = 10
+        play_sfx('jump', 1)
     end
 
     if not is_acting and controller.action_pressed then
@@ -83,9 +84,11 @@ function player.update(eid, delta)
             local balloon = entities:get_component(tracker.tracked, component.balloon)
             if balloon.air < 9 then
                 balloon.air = balloon.air + 1
+                play_sfx('pump', 1)
             end
         else
             new_balloon_box(transform.pos.x, transform.pos.y)
+            play_sfx('plant', 1)
         end
     end
 
