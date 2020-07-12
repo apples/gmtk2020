@@ -235,7 +235,7 @@ void scene_gameplay::tick(float delta) {
         }
         health.invulnerable_time -= delta;
         health.invulnerable = health.invulnerable_time > 0;
-        if (health.current == 0) {
+        if (health.current <= 0) {
             if (health.anim) {
                 auto iter = end(animations);
                 bool flip = false;
