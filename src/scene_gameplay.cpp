@@ -13,6 +13,7 @@
 #include "animations/gas.hpp"
 #include "animations/balloon_box.hpp"
 #include "animations/death.hpp"
+#include "animations/seed.hpp"
 
 #include "ember/camera.hpp"
 #include "ember/engine.hpp"
@@ -58,6 +59,7 @@ scene_gameplay::scene_gameplay(ember::engine& engine, ember::scene* prev)
     animations["gas"] = std::make_shared<gas_animation>();
     animations["balloon_box"] = std::make_shared<balloon_box_animation>();
     animations["death"] = std::make_shared<death_animation>();
+    animations["seed"] = std::make_shared<seed_animation>();
 }
 
 // Scene initialization
@@ -163,6 +165,19 @@ void scene_gameplay::tick(float delta) {
                 engine->call_script("actors." + script->name, "shoot", eid);
             }
             shooter.cooldown_timer = shooter.cooldown;
+        }
+    });
+    ember::perf::end_section();
+
+    // Seeder system
+    ember::perf::start_section("scene_gameplay.seeder");
+    entities.visit([&](ember::database::ent_id eid, component::seeder& seeder) {
+        seeder.cooldown_timer -= delta;
+        if (seeder.cooldown_timer <= 0) {
+            if (auto script = entities.get_component<component::script*>(eid)) {
+                engine->call_script("actors." + script->name, "seed", eid);
+            }
+            seeder.cooldown_timer = seeder.cooldown;
         }
     });
     ember::perf::end_section();

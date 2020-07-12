@@ -53,7 +53,8 @@ struct body {
         BUG = 5,
         GAS = 6,
         BOX = 7,
-        N_TYPES = 7,
+        SEED = 8,
+        N_TYPES = 8,
     };
 
     type_t type;
@@ -109,6 +110,12 @@ struct shooter {
     float cooldown_timer = 1;
 };
 REFLECT(shooter, (cooldown)(cooldown_timer))
+
+struct seeder {
+    float cooldown = 1;
+    float cooldown_timer = 1;
+};
+REFLECT(seeder, (cooldown)(cooldown_timer))
 
 struct health {
     int current = 1;
