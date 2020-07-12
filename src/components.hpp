@@ -125,8 +125,9 @@ REFLECT(growth, (growthTimer)(growTime)(stage))
 
 struct balloon {
     int air = 0;
+    int fruits = 0;
 };
-REFLECT(balloon, (air))
+REFLECT(balloon, (air)(fruits))
 
 struct balloon_tracker {
     std::optional<ember::database::ent_id> tracked;

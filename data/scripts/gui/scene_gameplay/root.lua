@@ -44,11 +44,20 @@ local function fruit_panel(props)
             vdom.create_element('label', {
                 height = 30 * 3,
                 color = props.fruits < 10 and '#cfd5d6' or '#ff4546',
-                text = props.fruits < 10 and props.fruits or (props.fruits .. ' (max)'),
+                text = props.fruits,
                 valign = 'top',
                 bottom = -34 * 3,
                 halign = 'left',
                 left = 52 * 3,
+            }),
+            props.fruits == 10 and vdom.create_element('label', {
+                height = 15 * 3,
+                color = '#ff4546',
+                text = '(max)',
+                valign = 'top',
+                bottom = -8 * 3,
+                halign = 'left',
+                left = 86 * 3,
             })
         )
 end

@@ -20,6 +20,8 @@ return function(x, y, dir)
     script.name = 'balloon_box'
 
     local balloon = component.balloon.new()
+    balloon.fruits = get_fruits()
+    set_fruits(0)
 
     local eid = entities:create_entity()
     entities:add_component(eid, sprite)

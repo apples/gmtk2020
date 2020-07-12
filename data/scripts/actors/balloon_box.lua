@@ -13,8 +13,8 @@ function balloon_box.update(eid, delta)
         body.accel.x = body.accel.x * math.pow(2, delta)
     end
 
-    if math.abs(transform.pos.x) > 40 --[[world_width / 2]] then
-        print('got balloon')
+    if math.abs(transform.pos.x) > world_width / 2 then
+        set_currency(get_currency() + balloon.fruits * 10)
         entities:destroy_entity(eid)
     end
 end
