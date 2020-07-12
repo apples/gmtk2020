@@ -1,6 +1,6 @@
 local new_player = require('archetypes.player')
-local new_plant = require('archetypes.defensivePlant')
-local new_plant2 = require('archetypes.valuablePlant')
+local new_defensive = require('archetypes.defensivePlant')
+local new_valuable = require('archetypes.valuablePlant')
 local new_red_beetle = require('archetypes.red_beetle')
 local new_platform = require('archetypes.platform')
 local new_beetle_spawner = require('archetypes.beetle_spawner')
@@ -43,12 +43,23 @@ local function make_ground()
     spawn_vertical_wall(-40)
 end
 
+local function spawn_initial_plants()
+    new_defensive((world_width / 2) - 5, 1)
+    new_defensive((world_width / 2) - 7, 1)
+    new_defensive((-world_width / 2) + 5, 1)
+    new_defensive((-world_width / 2) + 7, 1)
+
+    new_valuable((world_width / 2) - 2, 1)
+    new_valuable((-world_width / 2) + 2, 1)
+end
+
 function scene.init()
     print('Initializing gameplay...')
 
     new_player()
     make_ground()
     new_beetle_spawner()
+    spawn_initial_plants()
 
     play_bgm('Beeswax', 1)
 
