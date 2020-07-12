@@ -2,14 +2,25 @@
 
 #include "components.hpp"
 
+#include "ember/perf.hpp"
+
 void physics_system::step(ember::engine& engine, ember::database& entities, float delta) {
     time += delta;
 
     delta = 1.f/120.f;
 
+    auto collides_with = [&](const component::body& a, const component::body& b) {
+        return a.collides_with[b.layer];
+    };
+
+    auto events_with = [&](const component::body& a, const component::body& b) {
+        return a.events_with[b.layer];
+    };
+
     auto n_steps = int(time / delta);
 
     for (int i = 0; i < n_steps; ++i) {
+        ember::perf::start_section("physics.single_step");
         using type_t = component::body::type_t;
 
         struct manifold {
@@ -22,9 +33,12 @@ void physics_system::step(ember::engine& engine, ember::database& entities, floa
             component::transform* transform;
         };
 
+        ember::perf::start_section("physics.alloc_world");
         std::vector<world_object> objects;
         objects.reserve(entities.count_components<component::body>());
+        ember::perf::end_section();
 
+        ember::perf::start_section("physics.gather");
         entities.visit([&](ember::database::ent_id eid, component::body& body, component::transform& transform){
             body.vel *= glm::pow(glm::vec2{1, 1} - body.vel_damp, glm::vec2{delta, delta});
             body.vel += body.accel * delta;
@@ -41,20 +55,34 @@ void physics_system::step(ember::engine& engine, ember::database& entities, floa
                 &transform,
             });
         });
+        ember::perf::end_section();
 
+        ember::perf::start_section("physics.sort");
         std::sort(begin(objects), end(objects), [](auto& a, auto& b) {
             return a.left < b.left;
         });
+        ember::perf::end_section();
 
+        ember::perf::start_section("physics.alloc_current");
         std::vector<world_object*> current;
         current.reserve(objects.size());
+        ember::perf::end_section();
 
+        ember::perf::start_section("physics.sweep");
         for (auto& obj : objects) {
+            ember::perf::start_section("physics.prune");
             current.erase(std::remove_if(begin(current), end(current), [&](auto* a){
                 return a->right < obj.left || !entities.exists(a->eid);
             }), end(current));
+            ember::perf::end_section();
 
+            ember::perf::start_section("physics.inner_loop");
             for (auto& obj2 : current) {
+                if (!collides_with(*obj.body, *obj2->body) && !collides_with(*obj2->body, *obj.body)) {
+                    continue;
+                }
+
+                ember::perf::start_section("physics.calc_manifold");
                 auto overlap = manifold{
                     std::max(obj.left, obj2->left),
                     std::min(obj.right, obj2->right),
@@ -64,6 +92,7 @@ void physics_system::step(ember::engine& engine, ember::database& entities, floa
 
                 auto w = overlap.right - overlap.left;
                 auto h = overlap.top - overlap.bottom;
+                ember::perf::end_section();
 
                 if (w > 0 && h > 0) {
                     auto* ap = &obj;
@@ -75,29 +104,38 @@ void physics_system::step(ember::engine& engine, ember::database& entities, floa
                     auto& b = *bp;
 
                     // Pre-collide
-                    if (auto b_script = entities.get_component<component::script*>(b.eid)) {
-                        engine.call_script("systems.physics", "pre_collide", "actors."+b_script->name, b.eid, a.eid);
-                        if (!entities.exists(obj.eid)) {
-                            break;
-                        }
-                        if (!entities.exists(obj2->eid)) {
-                            continue;
-                        }
-                    }
-                    if (auto a_script = entities.get_component<component::script*>(a.eid)) {
-                        engine.call_script("systems.physics", "pre_collide", "actors."+a_script->name, a.eid, b.eid);
-                        if (!entities.exists(obj.eid)) {
-                            break;
-                        }
-                        if (!entities.exists(obj2->eid)) {
-                            continue;
+                    ember::perf::start_section("physics.pre_collide");
+                    if (events_with(*b.body, *a.body)) {
+                        if (auto b_script = entities.get_component<component::script*>(b.eid)) {
+                            engine.call_script(
+                                "systems.physics", "pre_collide", "actors." + b_script->name, b.eid, a.eid);
+                            if (!entities.exists(obj.eid)) {
+                                break;
+                            }
+                            if (!entities.exists(obj2->eid)) {
+                                continue;
+                            }
                         }
                     }
+                    if (events_with(*a.body, *b.body)) {
+                        if (auto a_script = entities.get_component<component::script*>(a.eid)) {
+                            engine.call_script(
+                                "systems.physics", "pre_collide", "actors." + a_script->name, a.eid, b.eid);
+                            if (!entities.exists(obj.eid)) {
+                                break;
+                            }
+                            if (!entities.exists(obj2->eid)) {
+                                continue;
+                            }
+                        }
+                    }
+                    ember::perf::end_section();
 
                     // Collide
+                    ember::perf::start_section("physics.collide");
                     if (a.body->type == type_t::DYNAMIC && b.body->type == type_t::DYNAMIC) {
                         if (w < h) {
-                            auto resolve_x = w/2;
+                            auto resolve_x = w / 2;
                             if (a.transform->pos.x < b.transform->pos.x) {
                                 resolve_x = -resolve_x;
                             }
@@ -109,7 +147,7 @@ void physics_system::step(ember::engine& engine, ember::database& entities, floa
                             b.left -= resolve_x;
                             b.right -= resolve_x;
                         } else {
-                            auto resolve_y = h/2;
+                            auto resolve_y = h / 2;
                             if (a.transform->pos.y < b.transform->pos.y) {
                                 resolve_y = -resolve_y;
                             }
@@ -162,28 +200,40 @@ void physics_system::step(ember::engine& engine, ember::database& entities, floa
                             b.top -= resolve_y;
                         }
                     }
+                    ember::perf::end_section();
 
                     // Post-collide
-                    if (auto b_script = entities.get_component<component::script*>(b.eid)) {
-                        engine.call_script("systems.physics", "post_collide", "actors."+b_script->name, b.eid, a.eid);
-                        if (!entities.exists(obj.eid)) {
-                            break;
-                        }
-                        if (!entities.exists(obj2->eid)) {
-                            continue;
-                        }
-                    }
-                    if (auto a_script = entities.get_component<component::script*>(a.eid)) {
-                        engine.call_script("systems.physics", "post_collide", "actors."+a_script->name, a.eid, b.eid);
-                        if (!entities.exists(obj.eid)) {
-                            break;
+                    ember::perf::start_section("physics.post_collide");
+                    if (events_with(*b.body, *a.body)) {
+                        if (auto b_script = entities.get_component<component::script*>(b.eid)) {
+                            engine.call_script(
+                                "systems.physics", "post_collide", "actors." + b_script->name, b.eid, a.eid);
+                            if (!entities.exists(obj.eid)) {
+                                break;
+                            }
+                            if (!entities.exists(obj2->eid)) {
+                                continue;
+                            }
                         }
                     }
+                    if (events_with(*a.body, *b.body)) {
+                        if (auto a_script = entities.get_component<component::script*>(a.eid)) {
+                            engine.call_script(
+                                "systems.physics", "post_collide", "actors." + a_script->name, a.eid, b.eid);
+                            if (!entities.exists(obj.eid)) {
+                                break;
+                            }
+                        }
+                    }
+                    ember::perf::end_section();
                 }
             }
 
             current.push_back(&obj);
         }
+        ember::perf::end_section();
+
+        ember::perf::end_section();
     }
 
     time -= delta * n_steps;

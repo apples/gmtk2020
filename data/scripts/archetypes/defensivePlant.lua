@@ -8,12 +8,11 @@ return function(x, y)
 
     local body = component.body.new()
     body.type = 0
-    body.layer = 1
+    body.layer = 2
     body.left = -0.25
     body.right  = 0.25
     body.bottom = 0
     body.top = 0.25
-    --body.collides_with[3] = true
     --body.accel.y = -10
 
     local script = component.script.new()

@@ -1,5 +1,7 @@
 #include "engine.hpp"
 
+#include "perf.hpp"
+
 #include <iostream>
 
 namespace ember {
@@ -7,7 +9,11 @@ namespace ember {
 void engine::tick() try {
     using namespace std::literals;
 
+    perf::start_frame();
+
     // Update clock
+
+    perf::start_section("update_clock");
 
     auto now = clock::now();
     auto delta = now - prev_time;
@@ -24,23 +30,39 @@ void engine::tick() try {
         framerate_buffer.clear();
     }
 
+    perf::end_section();
+
     // Pump events
+
+    perf::start_section("pump_events");
 
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
+        if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_p && (event.key.keysym.mod & KMOD_CTRL)) {
+            perf::enable(!perf::is_enabled());
+            std::cout << "Toggled perf\n";
+        }
         if (handle_gui_input(event))
             continue;
         if (handle_game_input(event))
             continue;
     }
 
+    perf::end_section();
+
     // Run current scene
+
+    perf::start_section("run_current_scene");
 
     if (current_scene) {
         current_scene->tick(std::chrono::duration<float>(delta).count());
     }
 
+    perf::end_section();
+
     // Render scene
+
+    perf::start_section("render_scene");
 
     glClearColor(0,0,0,1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -50,7 +72,11 @@ void engine::tick() try {
         update_gui_state(current_scene->render_gui());
     }
 
+    perf::end_section();
+
     // Render GUI
+
+    perf::start_section("render_gui");
 
     gui::calculate_all_layouts(*root_widget);
 
@@ -58,7 +84,11 @@ void engine::tick() try {
     gui::draw_all(*root_widget);
     renderer.end();
 
+    perf::end_section();
+
     // End of frame
+
+    perf::start_section("end_of_frame");
 
     if (queued_transition) {
         current_scene = queued_transition->factory(*this, current_scene.get());
@@ -70,6 +100,10 @@ void engine::tick() try {
     lua.collect_garbage();
 
     SDL_GL_SwapWindow(window);
+
+    perf::end_section();
+
+    perf::end_frame();
 } catch (const std::exception& e) {
     std::cerr << "ember::engine::tick: EXCEPTION: " << e.what() << std::endl;
     std::throw_with_nested(std::runtime_error("tick: "));

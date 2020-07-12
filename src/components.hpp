@@ -38,21 +38,24 @@ REFLECT(sprite, (name)(state)(flip)(time))
 
 struct body {
     enum type_t {
-        STATIC,
-        KINEMATIC,
-        DYNAMIC
+        STATIC = 0,
+        KINEMATIC = 1, /** DO NOT USE */
+        DYNAMIC = 2,
     };
 
     enum layer_t {
-        BALL,
-        PADDLE,
-        BRICK,
-        N_TYPES,
+        PLAYER = 0,
+        WALL = 1,
+        PLANT = 2,
+        PROJECTILE = 3,
+        BUG = 4,
+        N_TYPES = 5,
     };
 
     type_t type;
     layer_t layer;
     std::array<bool, N_TYPES> collides_with = {};
+    std::array<bool, N_TYPES> events_with = {};
     float left = 0;
     float right = 0;
     float bottom = 0;
@@ -61,7 +64,7 @@ struct body {
     glm::vec2 accel = {0, 0};
     glm::vec2 vel_damp = {0, 0};
 };
-REFLECT(body, (type)(layer)(collides_with)(left)(right)(bottom)(top)(vel)(accel)(vel_damp))
+REFLECT(body, (type)(layer)(collides_with)(events_with)(left)(right)(bottom)(top)(vel)(accel)(vel_damp))
 
 struct controller {
     bool left = false;

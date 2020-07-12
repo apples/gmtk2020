@@ -7,13 +7,16 @@ return function(x, y)
     transform.pos.y = y
 
     local body = component.body.new()
-    body.type = 1
-    body.layer = 1
+    body.type = 2
+    body.layer = 4
     body.left = -0.25
     body.right  = 0.25
     body.bottom = -0.25
     body.top = 0.25
-    --body.collides_with[3] = true
+    body.collides_with[1] = true
+    body.collides_with[2] = true
+    body.collides_with[3] = true
+    body.events_with[3] = true
     --body.accel.y = -10
 
     local script = component.script.new()

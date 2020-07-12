@@ -13,6 +13,7 @@
 #include "ember/camera.hpp"
 #include "ember/engine.hpp"
 #include "ember/vdom.hpp"
+#include "ember/perf.hpp"
 
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtx/matrix_transform_2d.hpp>
@@ -83,6 +84,7 @@ void scene_gameplay::init() {
 // Basically does everything except rendering.
 void scene_gameplay::tick(float delta) {
     // Targeting system
+    ember::perf::start_section("scene_gameplay.targeting");
     entities.visit([&](component::targeting& targeting) {
         if (!targeting.target || !entities.exists(*targeting.target)) {
             auto num_plants = entities.count_components<component::plant_tag>();
@@ -99,8 +101,10 @@ void scene_gameplay::tick(float delta) {
             }
         }
     });
+    ember::perf::end_section();
 
     // Shooter system
+    ember::perf::start_section("scene_gameplay.shooter");
     entities.visit([&](ember::database::ent_id eid, component::shooter& shooter) {
         shooter.cooldown_timer -= delta;
         if (shooter.cooldown_timer <= 0) {
@@ -110,15 +114,21 @@ void scene_gameplay::tick(float delta) {
             shooter.cooldown_timer = shooter.cooldown;
         }
     });
+    ember::perf::end_section();
 
     // Scripting system
+    ember::perf::start_section("scene_gameplay.scripting");
     engine->call_script("systems.scripting", "visit", delta);
+    ember::perf::end_section();
 
     // Physics system
+    ember::perf::start_section("scene_gameplay.physics");
     physics.step(*engine, entities, delta);
+    ember::perf::end_section();
 
 
     // Health system
+    ember::perf::start_section("scene_gameplay.health");
     entities.visit([&](ember::database::ent_id eid, component::health& health) {
         if (health.current > health.max) {
             health.current = health.max;
@@ -127,8 +137,10 @@ void scene_gameplay::tick(float delta) {
             entities.destroy_entity(eid);
         }
     });
+    ember::perf::end_section();
 
     // Camera system
+    ember::perf::start_section("scene_gameplay.camera");
     entities.visit([&](const component::player& player, const component::transform& transform) {
         auto range = world_width / 2.f - camera.height * camera.aspect_ratio / 2.f;
         camera.pos = glm::floor(
@@ -140,8 +152,10 @@ void scene_gameplay::tick(float delta) {
                          32.f) /
                      32.f;
     });
+    ember::perf::end_section();
 
     // Sprite system
+    ember::perf::start_section("scene_gameplay.sprite");
     entities.visit([&](ember::database::ent_id eid, component::sprite& sprite) {
         sprite.time += delta;
         auto iter = animations.find(sprite.name);
@@ -149,13 +163,16 @@ void scene_gameplay::tick(float delta) {
             iter->second->update(entities, eid);
         }
     });
+    ember::perf::end_section();
 
     // Reset controllers
+    ember::perf::start_section("scene_gameplay.reset_controllers");
     entities.visit([&](component::controller& con) {
         con.jump_pressed = false;
         con.sow_defensive = false;
         con.sow_valuable = false;
     });
+    ember::perf::end_section();
 
     gui_state["currency"] = currency;
 }
@@ -188,6 +205,7 @@ void scene_gameplay::render() {
 
     // Render background
     {
+        ember::perf::start_section("scene_gameplay.render_background");
         auto modelmat = glm::mat4{1.f};
 
         for (int i = 0; i < 3; ++i) {
@@ -213,10 +231,12 @@ void scene_gameplay::render() {
                 sushi::draw_mesh(screen_mesh);
             }
         }
+        ember::perf::end_section();
     }
 
     // Render tilemap
     {
+        ember::perf::start_section("scene_gameplay.render_tilemap");
         auto modelmat = glm::mat4(1.f);
 
         engine->basic_shader.set_uvmat(glm::mat3{1.f});
@@ -225,40 +245,51 @@ void scene_gameplay::render() {
 
         sushi::set_texture(0, *engine->texture_cache.get("tiles"));
         sushi::draw_mesh(tilemap_mesh);
+        ember::perf::end_section();
     }
 
     // Render entities
+    ember::perf::start_section("scene_gameplay.render_entities");
     entities.visit(
         [&](ember::database::ent_id eid, const component::sprite& sprite, const component::transform& transform) {
+            ember::perf::start_section("scene_gameplay.render_entities.get_anim_info");
             auto iter = animations.find(sprite.name);
             if (iter == end(animations)) {
                 iter = animations.find("default");
             }
-            
+
             auto info = iter->second->get_frame(entities, eid);
 
             if (sprite.flip) {
                 info.scale.x *= -1;
             }
+            ember::perf::end_section();
 
+            ember::perf::start_section("scene_gameplay.render_entities.calc_matrices");
             auto spritemat = glm::scale(glm::mat4{1}, glm::vec3{info.scale, 1});
             spritemat = glm::translate(spritemat, glm::vec3{-info.origin, 0});
             spritemat = glm::rotate(spritemat, glm::atan(info.heading.y, info.heading.x), glm::vec3{0, 0, 1});
             auto modelmat = to_mat4(transform) * spritemat;
-
-            auto tex = engine->texture_cache.get(info.texture);
+            ember::perf::end_section();
 
             // Calculate UV matrix for rendering the correct sprite.
+            ember::perf::start_section("scene_gameplay.render_entities.calc_uvs");
             auto cols = int(1 / info.uv_size.x);
             auto uvoffset = glm::vec2{info.frame % cols, info.frame / cols} * info.uv_size;
             auto uvmat = glm::mat3{1.f};
             uvmat = glm::translate(uvmat, uvoffset);
             uvmat = glm::scale(uvmat, info.uv_size);
+            ember::perf::end_section();
 
             // Set matrix uniforms.
+            ember::perf::start_section("scene_gameplay.render_entities.set_uniforms");
             engine->basic_shader.set_uvmat(uvmat);
             engine->basic_shader.set_normal_mat(glm::inverseTranspose(view * modelmat));
             engine->basic_shader.set_MVP(proj * view * modelmat);
+            ember::perf::end_section();
+
+            ember::perf::start_section("scene_gameplay.render_entities.draw");
+            auto tex = engine->texture_cache.get(info.texture);
 
             if (tex) {
                 sushi::set_texture(0, *tex);
@@ -267,7 +298,9 @@ void scene_gameplay::render() {
             }
 
             sushi::draw_mesh(sprite_mesh);
+            ember::perf::end_section();
         });
+    ember::perf::end_section();
 }
 
 // Handle input events, called asynchronously

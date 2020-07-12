@@ -7,12 +7,12 @@ return function()
 
     local body = component.body.new()
     body.type = 2
-    body.layer = 1
-    body.left = -0.5
-    body.right = 0.5
+    body.layer = 0
+    body.left = -0.25
+    body.right = 0.25
     body.bottom = -0.5
     body.top = 0.5
-    body.collides_with[3] = true
+    body.collides_with[2] = true
     body.accel.y = -10
 
     local controller = component.controller.new()
