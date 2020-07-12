@@ -148,6 +148,40 @@ engine::engine(const config::config& config) {
         return msdf_font("data/fonts/"+fontname+".ttf");
     };
 
+    // Audio caches
+
+    soloud.init();
+
+    sfx_cache = resource_cache<SoLoud::Wav, std::string>{[](const std::string& name) {
+        auto wav = std::make_shared<SoLoud::Wav>();
+        wav->load(("data/sfx/"+name+".wav").c_str());
+        return wav;
+    }};
+
+    bgm_cache = resource_cache<SoLoud::Wav, std::string>{[](const std::string& name) {
+        auto wav = std::make_shared<SoLoud::Wav>();
+        wav->load(("data/bgm/"+name+".ogg").c_str());
+        wav->setLooping(1);
+        return wav;
+    }};
+
+    auto play_sfx = [this](const std::string& name, float vol) {
+        auto wav_ptr = sfx_cache.get(name);
+        soloud.stopAudioSource(*wav_ptr);
+        auto hdl = soloud.play(*wav_ptr);
+        soloud.setVolume(hdl, vol);
+    };
+
+    auto play_bgm = [this](const std::string& name, float vol) {
+        auto wav_ptr = bgm_cache.get(name);
+        soloud.stopAudioSource(*wav_ptr);
+        auto hdl = soloud.play(*wav_ptr);
+        soloud.setVolume(hdl, vol);
+    };
+
+    lua["play_sfx"] = play_sfx;
+    lua["play_bgm"] = play_bgm;
+
     // Init GUI
 
     renderer = sushi_renderer(

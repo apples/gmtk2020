@@ -11,6 +11,9 @@
 
 #include <sol.hpp>
 #include <sushi/sushi.hpp>
+#include <soloud.h>
+#include <soloud_wav.h>
+#include <soloud_wavstream.h>
 
 #include <chrono>
 #include <sstream>
@@ -53,8 +56,12 @@ public:
     resource_cache<sushi::skeleton, std::string> skeleton_cache;
     resource_cache<sushi::texture_2d, std::string> texture_cache;
     resource_cache<msdf_font, std::string> font_cache;
+    resource_cache<SoLoud::Wav, std::string> sfx_cache;
+    resource_cache<SoLoud::Wav, std::string> bgm_cache;
     shaders::basic_shader_program basic_shader;
     shaders::msdf_shader_program msdf_shader;
+
+    SoLoud::Soloud soloud;
 
 private:
     void register_engine_module();

@@ -136,9 +136,10 @@ function player.update(eid, delta)
     if controller.collect and fruits < 10 then
         local eid = pick_fruit(transform.pos.x, transform.pos.y)
 
-        -- if eid then
-        --     set_fruits = fruits + 1;
-        -- end
+        if eid then
+            play_sfx('pickup', 1)
+            --set_fruits = fruits + 1;
+        end
     end
 end
 

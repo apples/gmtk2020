@@ -93,7 +93,6 @@ void scene_gameplay::init() {
         auto snappedPos = glm::vec2(std::floor(x * 2) / 2, std::floor((y - .5) * 2) / 2);
         std::optional<ember::database::ent_id> Eid = std::nullopt;
 
-        std::cout << "test0" << std::endl;
         entities.visit([&](ember::database::ent_id eid, component::valuable_tag, component::transform& trans, component::growth& grow) {
             if(trans.pos.x == snappedPos.x && trans.pos.y == snappedPos.y && grow.stage > 0) {
                 Eid = eid;
