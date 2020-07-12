@@ -42,7 +42,8 @@ scene_gameplay::scene_gameplay(ember::engine& engine, ember::scene* prev)
       screen_mesh{},
       world_width(80),
       rng(std::random_device{}()),
-      animations{} {
+      animations{},
+      delivered{0} {
     tilemap_mesh = get_tilemap_mesh(world_width);
     screen_mesh = get_screen_mesh(11.25 * 16 / 9.f, 11.25);
     camera.aspect_ratio = 16/9.f;
@@ -78,6 +79,8 @@ void scene_gameplay::init() {
     engine->lua["set_fruits"] = [this](int c) { fruits = c; };
     engine->lua["get_fruits"] = [this]() { return fruits; };
 
+    engine->lua["add_delivered"] = [this](int i) { delivered += i; };
+
     engine->lua["plant_at_position"] = [this](float x, float y) {
         auto snappedPos = glm::vec2(std::floor(x * 2) / 2, std::floor((y - .5) * 2) / 2);
         std::optional<ember::database::ent_id> result = std::nullopt;
@@ -106,6 +109,10 @@ void scene_gameplay::init() {
             }
         });
         return Eid;
+    };
+
+    engine->lua["to_title"] = [this]() {
+        engine->queue_transition<scene_mainmenu>();
     };
 
     engine->lua["math"]["randomseed"](rng());
@@ -337,6 +344,7 @@ void scene_gameplay::tick(float delta) {
 
     gui_state["currency"] = currency;
     gui_state["fruits"] = fruits;
+    gui_state["delivered"] = delivered;
 }
 
 // Render function

@@ -84,6 +84,42 @@ local function money_panel(props)
         )
 end
 
+local function game_over(props)
+    return vdom.create_element('panel', { width = '50%', height = '50%', valign='center', halign='center', color = '#000c' },
+        vdom.create_element(
+            'label',
+            {
+                halign = 'center',
+                bottom = 720/2 + 30 * 3,
+                color = '#fff',
+                text = 'Game over!',
+                height = 24 * 3,
+            }
+        ),
+        vdom.create_element(
+            'label',
+            {
+                halign = 'center',
+                bottom = 720/2,
+                color = '#fff',
+                text = 'Fruits delivered: '..props.delivered,
+                height = 24 * 3,
+            }
+        ),
+        vdom.create_element(
+            'label',
+            {
+                halign = 'center',
+                bottom = 720/2 - 60 * 3,
+                color = '#fff',
+                text = '[Back to Menu]',
+                height = 24 * 2,
+                on_click = to_title
+            }
+        )
+    )
+end
+
 -- health
 -- max_health
 -- currency
@@ -92,6 +128,7 @@ return function(props)
     return vdom.create_element('widget', { width = '100%', height = '100%' },
         vdom.create_element(hearts, props),
         vdom.create_element(money_panel, props),
-        vdom.create_element(fruit_panel, props)
+        vdom.create_element(fruit_panel, props),
+        props.health == 0 and vdom.create_element(game_over, props)
     )
 end

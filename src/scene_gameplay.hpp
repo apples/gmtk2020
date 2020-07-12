@@ -39,4 +39,5 @@ private:
     int world_width;
     std::mt19937 rng;
     std::unordered_map<std::string, std::shared_ptr<animation_state_machine>> animations;
+    int delivered;
 };
