@@ -121,8 +121,10 @@ struct health {
     int current = 1;
     int max = 1;
     bool anim = false;
+    bool invulnerable = false;
+    float invulnerable_time = 0;
 };
-REFLECT(health, (current)(max)(anim))
+REFLECT(health, (current)(max)(anim)(invulnerable)(invulnerable_time))
 
 struct growth {
     float growthTimer = 5;

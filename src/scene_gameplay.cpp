@@ -233,6 +233,8 @@ void scene_gameplay::tick(float delta) {
         if (health.current > health.max) {
             health.current = health.max;
         }
+        health.invulnerable_time -= delta;
+        health.invulnerable = health.invulnerable_time > 0;
         if (health.current == 0) {
             if (health.anim) {
                 auto iter = end(animations);
