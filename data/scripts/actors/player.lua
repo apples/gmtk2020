@@ -11,6 +11,7 @@ function player.update(eid, delta)
     local player = entities:get_component(eid, component.player)
     local sprite = entities:get_component(eid, component.sprite)
     local currency = get_currency()
+    local fruits = get_fruits()
 
     local max_speed = 8
     local focus_speed = 5
@@ -70,7 +71,6 @@ function player.update(eid, delta)
 
             new_defensive_plant(math.floor(transform.pos.x * 2) / 2, math.floor((transform.pos.y - .5) * 2) / 2)
         end
-        
     end
 
     if controller.sow_valuable and currency >= 20 then
@@ -79,7 +79,14 @@ function player.update(eid, delta)
 
             new_valuable_plant(math.floor(transform.pos.x * 2) / 2, math.floor((transform.pos.y - .5) * 2) / 2)
         end
-        
+    end
+
+    if controller.collect and fruits <= 10 then
+        local eid = pick_fruit(transform.pos.x, transform.pos.y)
+
+        if eid then
+            set_fruits = fruits + 1;
+        end
     end
 end
 

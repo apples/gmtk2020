@@ -30,6 +30,7 @@ scene_gameplay::scene_gameplay(ember::engine& engine, ember::scene* prev)
       camera(), // Camera has a sane default constructor, it is tweaked below
       entities(), // Entity database has no constructor parameters
       currency(),
+      fruits(),
       physics(), // Physics system
       gui_state{engine.lua.create_table()}, // Gui state is initialized to an empty Lua table
       sprite_mesh{get_sprite_mesh()}, // Sprite and tilemap meshes is created statically
@@ -65,6 +66,9 @@ void scene_gameplay::init() {
     engine->lua["set_currency"] = [this](int c) { currency = c; };
     engine->lua["get_currency"] = [this]() { return currency; };
 
+    engine->lua["set_fruits"] = [this](int c) { fruits = c; };
+    engine->lua["get_fruits"] = [this]() { return fruits; };
+
     engine->lua["plant_at_position"] = [this](float x, float y) {
         auto snappedPos = glm::vec2(std::floor(x * 2) / 2, std::floor((y - .5) * 2) / 2);
         bool result = false;
@@ -76,6 +80,24 @@ void scene_gameplay::init() {
         return result;
     };
 
+    engine->lua["pick_fruit"] = [this](float x, float y) {
+        auto snappedPos = glm::vec2(std::floor(x * 2) / 2, std::floor((y - .5) * 2) / 2);
+        std::optional<ember::database::ent_id> Eid = std::nullopt;
+
+        std::cout << "test0" << std::endl;
+        entities.visit([&](ember::database::ent_id eid, component::valuable_tag, component::transform& trans, component::growth& grow) {
+            std::cout << std::to_string(trans.pos.x) + " " + std::to_string(snappedPos.x) + ": " + std::to_string(trans.pos.y) + " " + std::to_string(snappedPos.y) + ": " + std::to_string(grow.stage)<< std::endl;
+            if(trans.pos.x == snappedPos.x && trans.pos.y == snappedPos.y && grow.stage > 0) {
+                std::cout << "test2" << std::endl;
+                Eid = eid;
+                grow.stage = 0;
+                if (auto script = entities.get_component<component::script*>(eid)) {
+                    engine->call_script("actors." + script->name, "grow", eid, grow.stage);
+                }
+            }
+        });
+        return Eid;
+    };
 
     // Call the "init" function in the "data/scripts/scenes/gameplay.lua" script, with no params.
     engine->call_script("scenes.gameplay", "init");
