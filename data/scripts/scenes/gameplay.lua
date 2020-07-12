@@ -9,7 +9,7 @@ local function make_ground()
 
     local body = component.body.new()
     body.type = 0
-    body.layer = 1
+    body.layer = 2
     body.left = -999
     body.right = 999
     body.bottom = -999
@@ -25,7 +25,7 @@ local function make_ground()
 
         local body = component.body.new()
         body.type = 0
-        body.layer = 1
+        body.layer = 2
         body.left = -1
         body.right = 1
         body.bottom = -999

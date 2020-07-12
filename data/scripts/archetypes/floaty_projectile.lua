@@ -8,7 +8,7 @@ return function(x, y, vx, vy)
     local body = component.body.new()
     local hbr = 1/16
     body.type = 2
-    body.layer = 3
+    body.layer = 4
     body.left = -hbr
     body.right = hbr
     body.bottom = -hbr
