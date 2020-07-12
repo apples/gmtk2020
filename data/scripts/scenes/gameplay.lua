@@ -14,7 +14,7 @@ local function make_ground()
     body.layer = 2
     body.left = -999
     body.right = 999
-    body.bottom = -999
+    body.bottom = -10
     body.top = 1
 
     local eid = entities:create_entity()
@@ -30,7 +30,7 @@ local function make_ground()
         body.layer = 2
         body.left = -1
         body.right = 1
-        body.bottom = -999
+        body.bottom = -10
         body.top = 999
 
         local eid = entities:create_entity()

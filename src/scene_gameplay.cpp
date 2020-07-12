@@ -12,6 +12,7 @@
 #include "animations/projectile.hpp"
 #include "animations/gas.hpp"
 #include "animations/balloon_box.hpp"
+#include "animations/death.hpp"
 
 #include "ember/camera.hpp"
 #include "ember/engine.hpp"
@@ -20,6 +21,7 @@
 
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtx/matrix_transform_2d.hpp>
+#include <glm/gtx/rotate_vector.hpp>
 
 #include <sushi/sushi.hpp>
 
@@ -55,6 +57,7 @@ scene_gameplay::scene_gameplay(ember::engine& engine, ember::scene* prev)
     animations["projectile"] = std::make_shared<projectile_animation>();
     animations["gas"] = std::make_shared<gas_animation>();
     animations["balloon_box"] = std::make_shared<balloon_box_animation>();
+    animations["death"] = std::make_shared<death_animation>();
 }
 
 // Scene initialization
@@ -185,9 +188,53 @@ void scene_gameplay::tick(float delta) {
             health.current = health.max;
         }
         if (health.current == 0) {
+            if (health.anim) {
+                auto iter = end(animations);
+                bool flip = false;
+                if (auto sprite = entities.get_component<component::sprite*>(eid)) {
+                    iter = animations.find(sprite->name);
+                    flip = sprite->flip;
+                }
+                if (iter == end(animations)) {
+                    iter = animations.find("default");
+                }
+
+                auto info = iter->second->get_frame(entities, eid);
+
+                if (flip) {
+                    info.scale.x *= -1;
+                }
+
+
+                auto anim = entities.create_entity();
+                entities.add_component(anim, component::death_anim{
+                    info,
+                    {(rng()&1) ? -10 : 10, 10},
+                    2,
+                });
+                entities.add_component(anim, component::sprite{"death"});
+                if (auto transform = entities.get_component<component::transform*>(eid)) {
+                    entities.add_component(anim, *transform);
+                }
+            }
             entities.destroy_entity(eid);
         }
     });
+    ember::perf::end_section();
+
+    // Death anim system
+    ember::perf::start_section("scene_gameplay.death_anim");
+    entities.visit(
+        [&](ember::database::ent_id eid, component::death_anim& death_anim, component::transform& transform) {
+            death_anim.time -= delta;
+            if (death_anim.time <= 0) {
+                entities.destroy_entity(eid);
+                return;
+            }
+            death_anim.vel.y -= 20 * delta;
+            transform.pos += glm::vec3(death_anim.vel * delta, 0);
+            death_anim.base_info.heading = glm::rotate(death_anim.base_info.heading, glm::radians(720.f) * delta);
+        });
     ember::perf::end_section();
 
     // Growth system
@@ -236,6 +283,14 @@ void scene_gameplay::tick(float delta) {
         con.pump_pressed = false;
         con.sow_defensive = false;
         con.sow_valuable = false;
+    });
+    ember::perf::end_section();
+
+    // Player UI meters
+    ember::perf::start_section("scene_gameplay.player_ui");
+    entities.visit([&](const component::player& player, const component::health& health) {
+        gui_state["health"] = health.current;
+        gui_state["max_health"] = health.max;
     });
     ember::perf::end_section();
 

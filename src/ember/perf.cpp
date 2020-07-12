@@ -67,7 +67,7 @@ void end_frame() {
     }
 }
 
-void start_section(const std::string& name) {
+void start_section(const char* name) {
     if (enabled) {
         auto& sec = sections[name];
         sec.hits += 1;

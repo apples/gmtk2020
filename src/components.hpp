@@ -1,5 +1,7 @@
 #pragma once
 
+#include "animation_state_machine.hpp"
+
 #include "ember/component_common.hpp"
 #include "ember/entities.hpp"
 #include "ember/net_id.hpp"
@@ -110,8 +112,9 @@ REFLECT(shooter, (cooldown)(cooldown_timer))
 struct health {
     int current = 1;
     int max = 1;
+    bool anim = false;
 };
-REFLECT(health, (current)(max))
+REFLECT(health, (current)(max)(anim))
 
 struct growth {
     float growthTimer = 1;
@@ -129,6 +132,13 @@ struct balloon_tracker {
     std::optional<ember::database::ent_id> tracked;
 };
 REFLECT(balloon_tracker, (tracked))
+
+struct death_anim {
+    animation_state_machine::animation_info base_info = {"default"};
+    glm::vec2 vel = {0, 0};
+    float time = 1;
+};
+REFLECT(death_anim, (base_info)(vel))
 
 } // namespace component
 

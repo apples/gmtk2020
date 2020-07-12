@@ -27,6 +27,7 @@ return function(x, y)
     local health = component.health.new()
     health.current = 3
     health.max = 3
+    health.anim = true
 
     local eid = entities:create_entity()
     entities:add_component(eid, sprite)

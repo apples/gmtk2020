@@ -26,6 +26,11 @@ return function()
 
     local balloon_tracker = component.balloon_tracker.new()
 
+    local health = component.health.new()
+    health.max = 3
+    health.current = 3
+    health.anim = true
+
     local eid = entities:create_entity()
     entities:add_component(eid, sprite)
     entities:add_component(eid, transform)
@@ -34,4 +39,5 @@ return function()
     entities:add_component(eid, script)
     entities:add_component(eid, player)
     entities:add_component(eid, balloon_tracker)
+    entities:add_component(eid, health)
 end
