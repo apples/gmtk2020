@@ -1,5 +1,6 @@
 local new_player = require('archetypes.player')
 local new_plant = require('archetypes.defensivePlant')
+local new_plant2 = require('archetypes.valuablePlant')
 local new_red_beetle = require('archetypes.red_beetle')
 
 local scene = {}
@@ -46,6 +47,7 @@ function scene.init()
     new_player()
     make_ground()
     new_plant(0, 1)
+    new_plant2(2, 3)--remove me
     new_red_beetle(0, 5)
 
     print('Initialized gameplay.')

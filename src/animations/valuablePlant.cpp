@@ -32,23 +32,23 @@ auto valuablePlant_animation::get_frame(ember::database& entities, const ember::
     switch (sprite.state) {
         case GROWTH0: {
             return {
-                "DefensePlant1",
+                "valuablePlant1",
                 {1, 1},
                 {0, -0.5},
-                {0.5, 0.25},
+                {1.0, 1.0},
                 0,
             };
         }
         case GROWTH1: {
             return {
-                "DefensePlant2",
+                "valuablePlant2",
                 {1, 1},
                 {0, -0.5},
-                {0.5, 1.0},
+                {1.0, 1.0},
                 0,
             };
         }
     }
 
-    return {"DefensePlant1"};
+    return {"valuablePlant1"};
 }

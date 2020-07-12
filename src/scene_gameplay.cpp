@@ -8,6 +8,7 @@
 #include "animations/player.hpp"
 #include "animations/red_beetle.hpp"
 #include "animations/defensivePlant.hpp"
+#include "animations/valuablePlant.hpp"
 #include "animations/projectile.hpp"
 
 #include "ember/camera.hpp"
@@ -47,6 +48,7 @@ scene_gameplay::scene_gameplay(ember::engine& engine, ember::scene* prev)
     animations["player"] = std::make_shared<player_animation>();
     animations["red_beetle"] = std::make_shared<red_beetle_animation>();
     animations["defensivePlant"] = std::make_shared<defensivePlant_animation>();
+    animations["valuablePlant"] = std::make_shared<valuablePlant_animation>();
     animations["projectile"] = std::make_shared<projectile_animation>();
 }
 
