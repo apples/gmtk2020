@@ -16,7 +16,9 @@ return function(x, y)
     body.collides_with[1] = true
     body.collides_with[2] = true
     body.collides_with[3] = true
+    body.events_with[1] = true
     body.events_with[3] = true
+    body.events_with[7] = true
     body.pass_through = true
 
     local script = component.script.new()

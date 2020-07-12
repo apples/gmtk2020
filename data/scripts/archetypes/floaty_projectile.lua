@@ -19,6 +19,7 @@ return function(x, y, vx, vy)
     body.events_with[1] = true
     body.events_with[2] = true
     body.events_with[5] = true
+    body.events_with[7] = true
     body.vel = vec2.new(vx, vy)
     body.accel.y = -5
     body.vel_damp = vec2.new(0.5, 0.5)

@@ -95,4 +95,3 @@ return function(props)
         vdom.create_element(fruit_panel, props)
     )
 end
-

@@ -124,12 +124,26 @@ void scene_gameplay::tick(float delta) {
     ember::perf::start_section("scene_gameplay.targeting");
     entities.visit([&](component::targeting& targeting) {
         if (!targeting.target || !entities.exists(*targeting.target)) {
-            auto num_plants = entities.count_components<component::plant_tag>();
+            auto num_plants = entities.count_components<component::plant_tag>() +
+                              entities.count_components<component::player>() +
+                              entities.count_components<component::balloon>();
             if (num_plants > 0) {
                 auto roll = std::uniform_int_distribution{0, num_plants - 1};
                 auto result = roll(rng);
                 targeting.target = std::nullopt;
                 entities.visit([&](ember::database::ent_id eid, component::plant_tag) {
+                    if (result == 0) {
+                        targeting.target = eid;
+                    }
+                    --result;
+                });
+                entities.visit([&](ember::database::ent_id eid, component::balloon) {
+                    if (result == 0) {
+                        targeting.target = eid;
+                    }
+                    --result;
+                });
+                entities.visit([&](ember::database::ent_id eid, component::player) {
                     if (result == 0) {
                         targeting.target = eid;
                     }

@@ -23,10 +23,16 @@ return function(x, y, dir)
     balloon.fruits = get_fruits()
     set_fruits(0)
 
+    local health = component.health.new()
+    health.current = 3
+    health.max = 3
+    health.anim = true
+
     local eid = entities:create_entity()
     entities:add_component(eid, sprite)
     entities:add_component(eid, transform)
     entities:add_component(eid, body)
     entities:add_component(eid, script)
     entities:add_component(eid, balloon)
+    entities:add_component(eid, health)
 end
